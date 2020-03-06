@@ -1,0 +1,47 @@
+// Functions, mixins, etc.
+
+// make horizontal numpad margins
+@mixin numpad-margins($row-letters, $positions-list) {
+  %numpad-margin {
+    margin-right: $base-row-margins * 3;
+  }
+  @each $letter in $row-letters {
+    .row-#{$letter} .key:nth-child(
+      #{list.nth($positions-list, list.index($row-letters, $letter))}
+    ) {
+      @extend %numpad-margin;
+    }
+  }
+}
+
+// make vertical margins
+@mixin row-margins() {
+  %row-margins {
+    margin-bottom: $base-row-margins;
+  }
+  @each $letter in $row-letters {
+    .row-#{$letter} {
+      @extend %row-margins;
+    }
+  }
+}
+
+// make row-k margins
+@mixin row-k-margins() {
+  $margins-row-k: 1, 5, 9, 13; // margin esc, and each 4th Functional key
+  %row-k-horizontal-margins {
+    margin-right: $base-row-margins * 2;
+  }
+  
+  @each $position in $margins-row-k {
+    .key:nth-child(#{$position}) {
+      @extend %row-k-horizontal-margins;
+    }
+  }
+}
+
+
+// change color, width & height of windows-logo-icon.svg
+@function svg-factory-windows-logo($fill-color, $width, $height) {
+  @return '<svg width="#{$width}" height="#{$height}" viewBox="0 0 256 257" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid"><path fill="#{$fill-color}" d="M0 36.357L104.62 22.11l.045 100.914-104.57.595L0 36.358zm104.57 98.293l.08 101.002L.081 221.275l-.006-87.302 104.494.677zm12.682-114.405L255.968 0v121.74l-138.716 1.1V20.246zM256 135.6l-.033 121.191-138.716-19.578-.194-101.84L256 135.6z"/></svg>';
+}
