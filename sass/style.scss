@@ -84,14 +84,15 @@ body {
       box-shadow: 2px 3px 3px 2px $keyboard-text-color;
 
       cursor: pointer;
+      user-select: none;
 
-      &:active {
-        box-shadow: 0px 1px 3px 0px $keyboard-text-color;
-        transition: box-shadow 0.15s ease-in;
-        top: 2px;
-        left: 2px;
-        // right: 5px;
-      }
+      // &:active {
+      //   box-shadow: 0px 1px 3px 0px $keyboard-text-color;
+      //   transition: box-shadow 0.15s ease-in;
+      //   top: 2px;
+      //   left: 2px;
+      //   // right: 5px;
+      // }
     }
 
     // set row margins to keys
@@ -233,6 +234,24 @@ body {
             width: $base-key-width - 2 * $padding-width;
           }
         }
+
+        &:nth-child(2)::after {
+          position: absolute;
+          right: 4px;
+          bottom: 0;
+          font-size: 18px;
+          opacity: 0.75;
+          content: "й";
+        }
+
+        &:nth-child(3)::after {
+          position: absolute;
+          right: 4px;
+          bottom: 0;
+          font-size: 18px;
+          opacity: 0.75;
+          content: "ц";
+        }
         
         &:nth-child(1) {
           width: $base-key-width + (100 - $base-row-margins * 3) / 2;
@@ -253,6 +272,7 @@ body {
             $base-key-height * 1.5 * 2 - 2 * $padding-top + $base-row-margins;
         }
 
+        /* fixes bug with position absolute positioning */
         &:nth-last-child(1):active {
           left: unset;
           right: 8px;
@@ -317,7 +337,7 @@ body {
           }
         }
 
-        // TODO:
+        // TODO: ???
         &:nth-child(1) {
           width: 125px;
           font-size: $base-font-size * 1.2;
@@ -326,15 +346,6 @@ body {
           width: 130px;
           font-size: $base-font-size * 1.2;
         }
-
-
-        // &:active {
-        //   box-shadow: 0px 1px 3px 0px $keyboard-text-color;
-        //   transition: box-shadow 0.15s ease-in;
-        //   top: 2px;
-        //   left: 2px;
-        //   // right: 5px;
-        // }
 
         &:nth-last-child(1) {
           position: absolute;
@@ -345,6 +356,7 @@ body {
           font-size: $base-font-size * 1.2;
         }
 
+        /* fixes bug with position absolute positioning */
         &:nth-last-child(1):active {
           left: unset;
           right: 8px;
@@ -422,6 +434,19 @@ button {
 .btn-W {
 }
 
-.key-active {
-  box-shadow: 0 0 5px 2px black;
+.section-keyboard .keyboard .key.key-active {
+  color: white;
+
+  box-shadow: 0px 1px 3px 0px $keyboard-text-color;
+  transition: box-shadow 0.15s ease-in;
+  top: 2px;
+  left: 2px;
+}
+
+.section-keyboard .keyboard .key:hover {
+  background-color: lighten($keyboard-bg-color, 5%);
+}
+
+.section-keyboard .keyboard .key.key-uppercase {
+  font-size: $base-font-size * 3.5;
 }
