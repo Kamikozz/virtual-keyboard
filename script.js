@@ -53,6 +53,136 @@ function createTree() {
   // showChilds();
 }
 
+function getAlphabet(language) {
+  const EN = 'english';
+  const RU = 'русский';
+
+  const languageEnglishRussian = {
+    '`': 'ё',
+    q: 'й',
+    w: 'ц',
+    e: 'у',
+    r: 'к',
+    t: 'е',
+    y: 'н',
+    u: 'г',
+    i: 'ш',
+    o: 'щ',
+    p: 'з',
+    '[': 'х',
+    ']': 'ъ',
+    a: 'ф',
+    s: 'ы',
+    d: 'в',
+    f: 'а',
+    g: 'п',
+    h: 'р',
+    j: 'о',
+    k: 'л',
+    l: 'д',
+    ';': 'ж',
+    '\'': 'э',
+    z: 'я',
+    x: 'ч',
+    c: 'с',
+    v: 'м',
+    b: 'и',
+    n: 'т',
+    m: 'ь',
+    ',': 'б',
+    '.': 'ю',
+    '/': '.',
+  };
+  const numpadEnglishRussian = {
+    '.': ',',
+  };
+
+  switch (language) {
+    case EN:
+      return [languageEnglishRussian, numpadEnglishRussian];
+    case RU: {
+      const languageRussianEnglish = {};
+      Object.keys(languageEnglishRussian).forEach((key) => {
+        // languageEnglishRussian[key] = value -> langRusEng[value] = key;
+        languageRussianEnglish[languageEnglishRussian[key]] = key;
+      });
+
+      const numpadRussianEnglish = {};
+      Object.keys(numpadEnglishRussian).forEach((key) => {
+        // languageEnglishRussian[key] = value -> langRusEng[value] = key;
+        numpadRussianEnglish[numpadEnglishRussian[key]] = key;
+      });
+      return [languageRussianEnglish, numpadRussianEnglish];
+    }
+    default: return [languageEnglishRussian, numpadEnglishRussian];
+  }
+}
+
+/**
+ * Gives 2 objects and optional keyClassName, gets all of the HTMLElements
+ * with the given keyClassName and changes their innerText
+ * according to alphabet & numpad.
+ * @param {Object} alphabet map with key/value of the main keys on keyboard
+ * @param {Object} numpad map with key/value of the numpad keys on keyboard
+ * @param {string} keyClassName string with the name of the class of keys
+ */
+function changeKeysInnerText(alphabet, numpad, keyClassName = 'key') {
+  // TODO: fix bug with innerText
+  // change symbols from english to russian, and backwards
+  const numpadKeys = Object.keys(numpad);
+  const numpadLength = numpadKeys ? numpadKeys.length : 0;
+
+  // get array of keys with keyClassName
+  let keys = document.getElementsByClassName(keyClassName);
+  keys = Array.prototype.map.call(keys, (node) => node.children[0]);
+  console.log(keys);
+
+
+  // change innerText to all of the elements (except numpad)
+  // TODO: удалить DELETE_ME, когда будет в продакшене
+  const DELETE_ME = 1;
+
+  for (let i = 0; i < keys.length - numpadLength - DELETE_ME; i++) {
+    const translatedLetter = alphabet[keys[i].innerText.toLowerCase()];
+    if (translatedLetter) keys[i].innerText = translatedLetter;
+  }
+
+  // change numpad elements innerText
+  for (let i = keys.length - numpadLength; i < keys.length; i++) {
+    const translatedLetter = numpad[keys[i]];
+    if (translatedLetter) keys[i].innerText = translatedLetter;
+  }
+}
+
+/**
+ * Invokes when window.onLoad() & gets the stored value in KEYBOARD_LANGUAGE
+ * & sets the current language of the keyboard, unhides the 'keyboard' class.
+ */
+function initLanguageFromStorage() {
+  const KEYBOARD_LANGUAGE = 'keyboardLanguage';
+  const EN = 'english';
+  const RU = 'русский';
+
+  switch (localStorage.getItem(KEYBOARD_LANGUAGE)) {
+    case RU: {
+      // change default english innerText to russian
+      const [alphabet, numpad] = getAlphabet(EN);
+      changeKeysInnerText(alphabet, numpad);
+      break;
+    }
+    case EN:
+    default: break;
+  }
+  // unhide the whole keyboard
+  document.getElementsByClassName('keyboard')[0].toggleAttribute('hidden');
+}
+
+
+/**
+ * Changes the language stored in localStorage to the opposite.
+ * Changes button's with className 'btn' innerText with name of the language.
+ * Changes keys' innerText to the opposite
+ */
 function changeLanguage() {
   const KEYBOARD_LANGUAGE = 'keyboardLanguage';
   const EN = 'english';
@@ -116,10 +246,9 @@ window.onload = () => {
   document.body.append(btn2);
 
   const textarea = document.getElementsByTagName('textarea')[0];
-  const keyZ = document.getElementsByClassName('key');
-  textarea.addEventListener('keydown', (e) => {
-    console.log('НАЖАЛИ');
-    console.log(e);
+
+  initLanguageFromStorage(); // set language from storage init
+
 
     if (e.repeat) return;
 
