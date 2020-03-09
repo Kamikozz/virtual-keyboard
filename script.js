@@ -189,22 +189,31 @@ function changeLanguage() {
   const RU = 'русский';
 
   // make changes with localStorage
+  // and get source alphabet pair map {'en':'ru'} or {'ru':'en'}
+  let alphabet;
+  let numpad;
   switch (localStorage.getItem(KEYBOARD_LANGUAGE)) {
-    case EN: localStorage.setItem(KEYBOARD_LANGUAGE, RU); break;
-    case RU: localStorage.setItem(KEYBOARD_LANGUAGE, EN); break;
-    default: localStorage.setItem(KEYBOARD_LANGUAGE, RU); break;
+    case RU:
+      localStorage.setItem(KEYBOARD_LANGUAGE, EN);
+      [alphabet, numpad] = getAlphabet(RU);
+      break;
+    case EN:
+    default:
+      localStorage.setItem(KEYBOARD_LANGUAGE, RU);
+      [alphabet, numpad] = getAlphabet(EN);
+      break;
   }
 
-  // make visual changes
+  // make visual changes into button
   const buttonName = document.getElementsByClassName('btn')[0];
-  buttonName.textContent = localStorage.getItem(KEYBOARD_LANGUAGE);
+  buttonName.innerText = localStorage.getItem(KEYBOARD_LANGUAGE);
 
-  const keys = document.getElementsByClassName('key');
-  if (localStorage.getItem(KEYBOARD_LANGUAGE) === EN) {
-    for (let i = 0; i < keys.length; i++) {
-      switch (keys[i].innerText.toLowerCase()) {
-        case 'w': keys[i].innerText = 'ц'; break;
-        default: break;
+  // change symbols from english to russian, and backwards
+  changeKeysInnerText(alphabet, numpad);
+}
+
+function changeCase() {
+
 }
 
 function handlerKeyInput(elem, event, textarea) {
@@ -435,13 +444,13 @@ function handlerKeyInput(elem, event, textarea) {
 
 window.onload = () => {
   // clear local storage
-  //localStorage.clear();
+  // localStorage.clear();
 
   createTree();
 
   const btn = document.createElement('button');
   btn.className = 'btn';
-  btn.textContent = 'Change language';
+  btn.innerText = 'Change language';
   document.body.append(btn);
 
   const getBtn = document.getElementsByClassName('btn')[0];
@@ -449,32 +458,97 @@ window.onload = () => {
 
   const btn2 = document.createElement('button');
   btn2.className = 'btn-W key';
-  btn2.textContent = 'w';
+  btn2.innerText = 'w';
   document.body.append(btn2);
 
   const textarea = document.getElementsByTagName('textarea')[0];
 
   initLanguageFromStorage(); // set language from storage init
 
+  // get array of keys 'key'
+  let keyZ = document.getElementsByClassName('key');
+  // TODO: children - возвращает массив, следовательно надо как-то эт массив сломать
+  // если будет бага, то вернуть node.children с node.children[0]
+  keyZ = Array.prototype.map.call(keyZ, (node) => node.children[0]);
+  console.log(keyZ);
+
+  const body = document.getElementsByTagName('body')[0];
+  body.addEventListener('keydown', (e) => {
+    console.log('НАЖАЛИ:', e);
+    // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
 
     if (e.repeat) return;
+
+    switch (e.key) {
+      case 'CapsLock':
+        changeCase(keyZ, e, 'Caps lock');
+        break;
+      case 'Shift':
+      // TODO: toUpperCase() or toLowerCase()
+        changeCase(keyZ, e, 'Shift');
+        break;
+      default: break;
+    }
+
+    if ((e.ctrlKey && e.shiftKey)
+      || (e.ctrlKey && e.altKey)
+      || (e.shiftKey && e.altKey)) {
+      changeLanguage();
+    }
+
+    textarea.focus();
 
     for (let i = 0; i < keyZ.length; i++) {
       if (keyZ[i].innerText === e.key) {
         keyZ[i].classList.add('key-active');
         break;
+      } else if ((keyZ[i].innerText === 'Esc' && e.key === 'Escape')
+        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
+        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlRight')
+        || (keyZ[i].innerText === 'Alt' && e.code === 'AltLeft')
+        || (keyZ[i].innerText === 'Altgr' && e.code === 'AltRight')) {
+        keyZ[i].classList.add('key-active');
+        break;
+      } else if (
+        (keyZ[i].innerText === 'Caps lock' && e.key === 'CapsLock')
+        || (keyZ[i].innerText === 'Num lock' && e.key === 'NumLock')) {
+        if (keyZ[i].classList.value.indexOf('key-active') !== -1) {
+          // if 'key-active' is present then delete it
+          keyZ[i].classList.remove('key-active');
+        } else {
+          keyZ[i].classList.add('key-active');
+        }
+        break;
       }
     }
-    
+
+    for (let i = 0; i < keyZ.length; i++) {
+      if (keyZ[i].innerText === 'Tab') {
+        console.log(keyZ[i], e);
+        // handlerKeyInput(keyZ[i], e, textarea);
+        break;
+      }
+    }
   });
 
-  textarea.addEventListener('keyup', (e) => {
-    console.log('ОТПУСТИЛИ');
-    console.log(e);
+  body.addEventListener('keyup', (e) => {
+    console.log('ОТПУСТИЛИ:', e);
+
+    // if (e.repeat) return;
+    if (e.code === 'CapsLock') {
+      return;
+    }
 
     // если отпустили - сбросить зажатие клавиши
     for (let i = 0; i < keyZ.length; i++) {
       if (keyZ[i].innerText === e.key) {
+        keyZ[i].classList.remove('key-active');
+        break;
+      } else if ((keyZ[i].innerText === 'Esc' && e.key === 'Escape')
+        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
+        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlRight')
+        || (keyZ[i].innerText === 'Alt' && e.code === 'AltLeft')
+        || (keyZ[i].innerText === 'Altgr' && e.code === 'AltRight')) {
         keyZ[i].classList.remove('key-active');
         break;
       }
