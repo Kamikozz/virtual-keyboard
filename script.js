@@ -205,25 +205,232 @@ function changeLanguage() {
       switch (keys[i].innerText.toLowerCase()) {
         case 'w': keys[i].innerText = 'ц'; break;
         default: break;
-      }
-      console.log(keys[i]);
-    }
-  } else {
-    for (let i = 0; i < keys.length; i++) {
-      switch (keys[i].innerText.toLowerCase()) {
-        case 'ц': keys[i].innerText = 'w'; break;
-        default: break;
-      }
-      console.log(keys[i]);
-    }
-  }
-
-
-  // console.log(keys);
 }
 
-function addSymbol(textarea, symbol) {
-  textarea.value += symbol;
+function handlerKeyInput(elem, event, textarea) {
+  if (!elem) return;
+
+  const text = textarea;
+  text.focus();
+
+  // event.preventDefault();
+
+  const el = elem.children[0];
+  switch (el.innerText) {
+    case 'Esc': case 'F1': case 'F2': case 'F3': case 'F4': case 'F6':
+    case 'F7': case 'F8': case 'F9': case 'F10': case 'F12':
+    case 'Prtscr': case 'Scroll lock': case 'Pause': case 'Insert':
+    case 'Num lock': case 'Ctrl': case 'Fn':
+    case 'Alt': case 'Altgr': case '↑': case '↓':
+      break;
+    case 'F5':
+      document.location.reload();
+      break;
+    case 'F11': {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+      break;
+    }
+    case 'Delete': {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+      const len = 1;
+
+      if (start !== end) {
+        // if selection presents -> cut between start & end
+        const strBefore = text.value.substring(0, start);
+        const strAfter = text.value.substring(end);
+
+        // set textarea value to: text before caret + text after caret
+        text.value = `${strBefore}${strAfter}`;
+
+        // put caret at right position
+        text.selectionEnd = start;
+      } else if (end !== text.value.length) {
+        const strBefore = text.value.substring(0, start);
+        const strAfter = text.value.substring(end + len);
+
+        // set textarea value to: text before caret + text after caret
+        text.value = `${strBefore}${strAfter}`;
+
+        // put caret at right position
+        text.selectionEnd = start;
+      }
+      break;
+    }
+    case 'Pgup': {
+      const fixOffset = 110;
+      const offset = document.documentElement.clientHeight - fixOffset;
+      window.scrollBy(0, -offset);
+      break;
+    }
+    case 'Pgdn': {
+      const fixOffset = 110;
+      const offset = document.documentElement.clientHeight - fixOffset;
+      window.scrollBy(0, +offset);
+      break;
+    }
+    case 'Backspace': {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+      const len = 1;
+
+      if (start !== end) {
+        const strBefore = text.value.substring(0, start);
+        const strAfter = text.value.substring(end);
+
+        // set textarea value to: text before caret + text after caret
+        text.value = `${strBefore}${strAfter}`;
+
+        // put caret at right position
+        text.selectionEnd = start;
+      } else if (start !== 0) {
+        const strBefore = text.value.substring(0, start - len);
+        const strAfter = text.value.substring(end);
+
+        // set textarea value to: text before caret + text after caret
+        text.value = `${strBefore}${strAfter}`;
+
+        // put caret at right position
+        text.selectionStart = start - len;
+        text.selectionEnd = text.selectionStart;
+      }
+      break;
+    }
+    case 'Tab': {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+
+      const strBefore = text.value.substring(0, start);
+      const strAfter = text.value.substring(end);
+      const tab = '\t';
+
+      // set textarea value to: text before caret + tab + text after caret
+      text.value = `${strBefore}${tab}${strAfter}`;
+
+      // put caret at right position
+      text.selectionStart = start + tab.length;
+      text.selectionEnd = text.selectionStart;
+      break;
+    }
+    case 'Caps lock':
+      // TODO: changeCase
+      //changeCase(keyZ, e, 'Caps lock');
+      break;
+    case 'Shift':
+      // TODO: changeCase
+      //changeCase(keyZ, e, 'Caps lock');
+      break;
+    case 'Enter': {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+
+      const strBefore = text.value.substring(0, start);
+      const strAfter = text.value.substring(end);
+      const newline = '\n';
+
+      // set textarea value to: text before caret + newline + text after caret
+      text.value = `${strBefore}${newline}${strAfter}`;
+
+      // put caret at right position
+      text.selectionStart = start + newline.length;
+      text.selectionEnd = text.selectionStart;
+      break;
+    }
+    case '- -': {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+
+      const strBefore = text.value.substring(0, start);
+      const strAfter = text.value.substring(end);
+      const symbol = ' ';
+
+      // set textarea value to: text before caret + tab + text after caret
+      text.value = `${strBefore}${symbol}${strAfter}`;
+
+      // put caret at right position
+      text.selectionStart = start + symbol.length;
+      text.selectionEnd = text.selectionStart;
+      break;
+    }
+    case '<': {
+      // TODO: \| <
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+
+      const strBefore = text.value.substring(0, start);
+      const strAfter = text.value.substring(end);
+      const symbol = '\\';
+
+      // set textarea value to: text before caret + tab + text after caret
+      text.value = `${strBefore}${symbol}${strAfter}`;
+
+      // put caret at right position
+      text.selectionStart = start + symbol.length;
+      text.selectionEnd = text.selectionStart;
+      break;
+    }
+    case '←': {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+
+      // check if selection presents
+      if (start !== end) {
+        // remove selection
+        text.selectionEnd = text.selectionStart;
+      } else if (start !== 0) {
+        // handle out of left boundaries
+        text.selectionStart = start - 1;
+        text.selectionEnd = text.selectionStart;
+      }
+      break;
+    }
+    case '→': {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+
+      // check if selection presents
+      if (start !== end) {
+        // remove selection
+        text.selectionStart = text.selectionEnd;
+      } else if (end !== text.value.length) {
+        // handle out of right boundaries
+        text.selectionStart = start + 1;
+        text.selectionEnd = text.selectionStart;
+      }
+      break;
+    }
+    default: {
+      event.preventDefault();
+      const start = text.selectionStart;
+      const end = text.selectionEnd;
+
+      const strBefore = text.value.substring(0, start);
+      const strAfter = text.value.substring(end);
+      const symbol = el.innerText;
+
+      // set textarea value to: text before caret + tab + text after caret
+      text.value = `${strBefore}${symbol}${strAfter}`;
+
+      // put caret at right position
+      text.selectionStart = start + symbol.length;
+      text.selectionEnd = text.selectionStart;
+      console.log(text.selectionStart, text.selectionEnd);
+      break;
+    }
+  }
+  console.log(el);
 }
 
 window.onload = () => {
@@ -276,16 +483,53 @@ window.onload = () => {
 
   const getBtn2 = document.getElementsByClassName('btn-W')[0];
   getBtn2.addEventListener('mousedown', (e) => {
-    console.log(e);
+    console.log('mousedown', e);
   });
 
   getBtn2.addEventListener('click', (e) => {
-    console.log(e);
+    console.log('mouseclick', e);
     addSymbol(textarea, e.target.innerText);
   });
-
+  getBtn2.addEventListener('mouseup', (e) => {
+    console.log('mouseup', e);
+  });
 
   // TODO: событие клика - сделать что-то once
   // TODO: событие mousedown - делать что-то many times
   // TODO: динамическая смена раскладки
+
+  // ///////////////////////// MOUSE HANDLERS ///////////////////////////
+  // store event object if mousedown fired at 'key' class
+  let mousedownFiredEvent;
+  document.addEventListener('mouseup', (e) => {
+    console.log('mouseup at DOCUMENT', e);
+    // if mousedown above any of the 'key' class
+    if (mousedownFiredEvent) {
+      mousedownFiredEvent.classList.remove('key-active');
+    }
+  });
+
+  const keyboard = document.getElementsByClassName('keyboard')[0];
+  keyboard.addEventListener('mousedown', (e) => {
+    // console.log(e);
+
+    // find div.key
+    let target;
+    if (e.target.classList.value.indexOf('key') !== -1) {
+      // if exists then check if it's exactly 'key' not 'keyboard'
+      for (let i = 0; i < e.target.classList.length; i++) {
+        if (e.target.classList[i] === 'key') { target = e.target; break; }
+      }
+    } else if (!e.target.children.length) {
+      target = e.target.parentElement;
+    }
+    // store this node as a fired mousedown event to the future
+    mousedownFiredEvent = target;
+
+    // make UI effects if event exists
+    if (target) target.classList.add('key-active');
+
+    // key input handler
+    handlerKeyInput(target, e, textarea);
+  });
 };
