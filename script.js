@@ -437,6 +437,11 @@ function handlerKeyInput(elem, event, textarea) {
   console.log(el);
 }
 
+function playKeypressSound() {
+  const audio = new Audio('assets/sound/key-press.mp3');
+  audio.play();
+}
+
 // function init() {
 //   // clear local storage
 //   // localStorage.clear();
@@ -461,13 +466,13 @@ function initElements() {
     textarea: document.getElementsByTagName('textarea')[0],
     keys: [...document.getElementsByClassName('key')], // get array of keys 'key'
     keyboard: document.getElementsByClassName('keyboard')[0],
-  }
+  };
 }
 
 function initTempVars() {
   return {
     mousedownFiredEvent: null, // store event object if mousedown fired at 'key' class
-  }
+  };
 }
 
 // //////////////////////////////////
@@ -484,9 +489,12 @@ initLanguageFromStorage(); // set language from storage init
 // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
 const handlerKeyDown = (e) => {
   console.log('НАЖАЛИ:', e);
+
   // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
 
   if (e.repeat) return;
+
+  playKeypressSound();
 
   switch (e.key) {
     case 'CapsLock':
@@ -580,11 +588,15 @@ const handlerMouseDown = (e) => {
   } else if (!e.target.children.length) {
     target = e.target.parentElement;
   }
-  // store this node as a fired mousedown event to the future
+  // store this node as a fired mousedown event to the future removal
   tempVars.mousedownFiredEvent = target;
 
   // make UI effects if event exists
-  if (target) target.classList.add('key-active');
+  if (target) {
+    playKeypressSound();
+    target.classList.add('key-active');
+  }
+
 
   // key input handler
   handlerKeyInput(target, e, elements.textarea);
@@ -609,7 +621,7 @@ function initHandlers() {
 
 initHandlers();
 
-// TODO: физический TAB не даёт нужного результата, как событие по клику на кнопке TAB
+// FIXME: физический TAB не даёт нужного результата, как событие по клику на кнопке TAB (нужен preventDefault)
 // TODO: смотреть на User Agent, если он связан с Mac OS => делать кнопки как у Mac, иначе как у Windows
 // TODO: некоторые символы генерируют вместо \ - значок параграфа (в виртуалке, на MacOS)
 // TODO: теряется фокус с textarea при нажатии на Alt (но в виртуалке не теряется)
@@ -619,4 +631,5 @@ initHandlers();
 
 // FIXME: indexof -> includes
 // TODO: Значок Win менять на Яблоко в MacOS (и красить в белый цвет через inline-svg)
-// FIXME: зажали клавиши и потеряли фокус с браузера на что-то кроме
+// TODO: зажали клавиши и потеряли фокус с браузера на что-то кроме (хз, не фиксится)
+// FIXME: много повторных нажатий клавиш генерируют звук, фу
