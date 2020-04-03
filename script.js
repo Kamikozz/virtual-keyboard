@@ -1,9 +1,3 @@
-function showChilds() {
-  for (let i = 0; i < document.body.childNodes.length; i++) {
-    console.log(document.body.childNodes[i]);
-  }
-}
-
 function createSection(className) {
   const section = document.createElement('section');
   if (arguments.length) section.className = className;
@@ -28,6 +22,8 @@ function createInput() {
 function createKeyboard() {
   const keyboard = document.createElement('div');
   keyboard.className = 'keyboard';
+  // keyboard.setAttribute('hidden', 'true');
+  // keyboard.setAttribute('hidden');
 
   console.log('Created new keyboard');
   return keyboard;
@@ -50,7 +46,6 @@ function createTree() {
   console.log(main);
 
   document.body.append(main);
-  // showChilds();
 }
 
 function getAlphabet(language) {
@@ -204,16 +199,16 @@ function changeLanguage() {
       break;
   }
 
-  // make visual changes into button
-  const buttonName = document.getElementsByClassName('btn')[0];
-  buttonName.innerText = localStorage.getItem(KEYBOARD_LANGUAGE);
+  // // make visual changes into button
+  // const buttonName = document.getElementsByClassName('btn')[0];
+  // buttonName.innerText = localStorage.getItem(KEYBOARD_LANGUAGE);
 
   // change symbols from english to russian, and backwards
   changeKeysInnerText(alphabet, numpad);
 }
 
 function changeCase() {
-
+  console.log('lol');
 }
 
 function handlerKeyInput(elem, event, textarea) {
@@ -442,168 +437,186 @@ function handlerKeyInput(elem, event, textarea) {
   console.log(el);
 }
 
-window.onload = () => {
-  // clear local storage
-  // localStorage.clear();
+// function init() {
+//   // clear local storage
+//   // localStorage.clear();
 
-  createTree();
+//   createTree();
+// }
 
-  const btn = document.createElement('button');
-  btn.className = 'btn';
-  btn.innerText = 'Change language';
-  document.body.append(btn);
+function initElements() {
+  // const textarea = document.getElementsByTagName('textarea')[0];
 
-  const getBtn = document.getElementsByClassName('btn')[0];
-  getBtn.addEventListener('click', changeLanguage);
-
-  const btn2 = document.createElement('button');
-  btn2.className = 'btn-W key';
-  btn2.innerText = 'w';
-  document.body.append(btn2);
-
-  const textarea = document.getElementsByTagName('textarea')[0];
-
-  initLanguageFromStorage(); // set language from storage init
-
-  // get array of keys 'key'
-  let keyZ = document.getElementsByClassName('key');
+  // // get array of keys 'key'
+  // const keys = [...document.getElementsByClassName('key')];
+  // console.log(keys);
   // TODO: children - возвращает массив, следовательно надо как-то эт массив сломать
   // если будет бага, то вернуть node.children с node.children[0]
-  keyZ = Array.prototype.map.call(keyZ, (node) => node.children[0]);
-  console.log(keyZ);
+  // const keyZ = Array.prototype.map.call(keys, (node) => node.children[0]);
+  // const keyZ = [...keys];
+  // console.log(keyZ);
 
-  const body = document.getElementsByTagName('body')[0];
-  body.addEventListener('keydown', (e) => {
-    console.log('НАЖАЛИ:', e);
-    // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
+  // const keyboard = document.getElementsByClassName('keyboard')[0];
+  return {
+    textarea: document.getElementsByTagName('textarea')[0],
+    keys: [...document.getElementsByClassName('key')], // get array of keys 'key'
+    keyboard: document.getElementsByClassName('keyboard')[0],
+  }
+}
 
-    if (e.repeat) return;
+function initTempVars() {
+  return {
+    mousedownFiredEvent: null, // store event object if mousedown fired at 'key' class
+  }
+}
 
-    switch (e.key) {
-      case 'CapsLock':
-        changeCase(keyZ, e, 'Caps lock');
-        break;
-      case 'Shift':
-      // TODO: toUpperCase() or toLowerCase()
-        changeCase(keyZ, e, 'Shift');
-        break;
-      default: break;
-    }
+// //////////////////////////////////
+// clear local storage
+// localStorage.clear();
 
-    if ((e.ctrlKey && e.shiftKey)
-      || (e.ctrlKey && e.altKey)
-      || (e.shiftKey && e.altKey)) {
-      changeLanguage();
-    }
+createTree();
 
-    textarea.focus();
+const elements = initElements();
+const tempVars = initTempVars();
 
-    for (let i = 0; i < keyZ.length; i++) {
-      if (keyZ[i].innerText === e.key) {
-        keyZ[i].classList.add('key-active');
-        break;
-      } else if ((keyZ[i].innerText === 'Esc' && e.key === 'Escape')
-        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
-        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlRight')
-        || (keyZ[i].innerText === 'Alt' && e.code === 'AltLeft')
-        || (keyZ[i].innerText === 'Altgr' && e.code === 'AltRight')) {
-        keyZ[i].classList.add('key-active');
-        break;
-      } else if (
-        (keyZ[i].innerText === 'Caps lock' && e.key === 'CapsLock')
-        || (keyZ[i].innerText === 'Num lock' && e.key === 'NumLock')) {
-        if (keyZ[i].classList.value.indexOf('key-active') !== -1) {
-          // if 'key-active' is present then delete it
-          keyZ[i].classList.remove('key-active');
-        } else {
-          keyZ[i].classList.add('key-active');
-        }
-        break;
+initLanguageFromStorage(); // set language from storage init
+
+// ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
+const handlerKeyDown = (e) => {
+  console.log('НАЖАЛИ:', e);
+  // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
+
+  if (e.repeat) return;
+
+  switch (e.key) {
+    case 'CapsLock':
+      changeCase(elements.keys, e, 'Caps lock');
+      break;
+    case 'Shift':
+    // TODO: toUpperCase() or toLowerCase()
+      changeCase(elements.keys, e, 'Shift');
+      break;
+    default: break;
+  }
+
+  if ((e.ctrlKey && e.shiftKey)
+    || (e.ctrlKey && e.altKey)
+    || (e.shiftKey && e.altKey)) {
+    changeLanguage();
+  }
+
+  elements.textarea.focus();
+
+  for (let i = 0; i < elements.keys.length; i += 1) {
+    if (elements.keys[i].innerText === e.key) {
+      elements.keys[i].classList.add('key-active');
+      break;
+    } else if ((elements.keys[i].innerText === 'Esc' && e.key === 'Escape')
+      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
+      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlRight')
+      || (elements.keys[i].innerText === 'Alt' && e.code === 'AltLeft')
+      || (elements.keys[i].innerText === 'Altgr' && e.code === 'AltRight')) {
+      elements.keys[i].classList.add('key-active');
+      break;
+    } else if (
+      (elements.keys[i].innerText === 'Caps lock' && e.key === 'CapsLock')
+      || (elements.keys[i].innerText === 'Num lock' && e.key === 'NumLock')) {
+      if (elements.keys[i].classList.value.indexOf('key-active') !== -1) {
+        // if 'key-active' is present then delete it
+        elements.keys[i].classList.remove('key-active');
+      } else {
+        elements.keys[i].classList.add('key-active');
       }
+      break;
     }
+  }
 
-    for (let i = 0; i < keyZ.length; i++) {
-      if (keyZ[i].innerText === 'Tab') {
-        console.log(keyZ[i], e);
-        // handlerKeyInput(keyZ[i], e, textarea);
-        break;
-      }
+  for (let i = 0; i < elements.keys.length; i += 1) {
+    if (elements.keys[i].innerText === 'Tab') {
+      console.log(elements.keys[i], e);
+      // handlerKeyInput(keyZ[i], e, textarea);
+      break;
     }
-  });
+  }
+};
+const handlerKeyUp = (e) => {
+  console.log('ОТПУСТИЛИ:', e);
 
-  body.addEventListener('keyup', (e) => {
-    console.log('ОТПУСТИЛИ:', e);
+  // if (e.repeat) return;
+  if (e.code === 'CapsLock') {
+    return;
+  }
 
-    // if (e.repeat) return;
-    if (e.code === 'CapsLock') {
-      return;
+  // если отпустили - сбросить зажатие клавиши
+  for (let i = 0; i < elements.keys.length; i += 1) {
+    if (elements.keys[i].innerText === e.key) {
+      elements.keys[i].classList.remove('key-active');
+      break;
+    } else if ((elements.keys[i].innerText === 'Esc' && e.key === 'Escape')
+      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
+      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlRight')
+      || (elements.keys[i].innerText === 'Alt' && e.code === 'AltLeft')
+      || (elements.keys[i].innerText === 'Altgr' && e.code === 'AltRight')) {
+      elements.keys[i].classList.remove('key-active');
+      break;
     }
+  }
+};
 
-    // если отпустили - сбросить зажатие клавиши
-    for (let i = 0; i < keyZ.length; i++) {
-      if (keyZ[i].innerText === e.key) {
-        keyZ[i].classList.remove('key-active');
-        break;
-      } else if ((keyZ[i].innerText === 'Esc' && e.key === 'Escape')
-        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
-        || (keyZ[i].innerText === 'Ctrl' && e.code === 'ControlRight')
-        || (keyZ[i].innerText === 'Alt' && e.code === 'AltLeft')
-        || (keyZ[i].innerText === 'Altgr' && e.code === 'AltRight')) {
-        keyZ[i].classList.remove('key-active');
-        break;
-      }
+// ///////////////////////// MOUSE HANDLERS ///////////////////////////
+// TODO: событие клика - сделать что-то once
+// TODO: событие mousedown - делать что-то many times
+// TODO: динамическая смена раскладки
+const handlerMouseDown = (e) => {
+  // console.log(e);
+
+  // find div.key
+  let target;
+  if (e.target.classList.value.indexOf('key') !== -1) {
+    // if exists then check if it's exactly 'key' not 'keyboard'
+    for (let i = 0; i < e.target.classList.length; i += 1) {
+      if (e.target.classList[i] === 'key') { target = e.target; break; }
     }
-  });
+  } else if (!e.target.children.length) {
+    target = e.target.parentElement;
+  }
+  // store this node as a fired mousedown event to the future
+  tempVars.mousedownFiredEvent = target;
 
-  const getBtn2 = document.getElementsByClassName('btn-W')[0];
-  getBtn2.addEventListener('mousedown', (e) => {
-    console.log('mousedown', e);
-  });
+  // make UI effects if event exists
+  if (target) target.classList.add('key-active');
 
-  getBtn2.addEventListener('click', (e) => {
-    console.log('mouseclick', e);
-    addSymbol(textarea, e.target.innerText);
-  });
-  getBtn2.addEventListener('mouseup', (e) => {
-    console.log('mouseup', e);
-  });
+  // key input handler
+  handlerKeyInput(target, e, elements.textarea);
+};
+const handlerMouseUp = (e) => {
+  console.log('mouseup at DOCUMENT', e);
+  // if mousedown above any of the 'key' class
+  if (tempVars.mousedownFiredEvent) {
+    tempVars.mousedownFiredEvent.classList.remove('key-active');
+  }
+};
 
-  // TODO: событие клика - сделать что-то once
-  // TODO: событие mousedown - делать что-то many times
-  // TODO: динамическая смена раскладки
+function initHandlers() {
+  // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
+  document.body.addEventListener('keydown', handlerKeyDown);
+  document.body.addEventListener('keyup', handlerKeyUp);
 
   // ///////////////////////// MOUSE HANDLERS ///////////////////////////
-  // store event object if mousedown fired at 'key' class
-  let mousedownFiredEvent;
-  document.addEventListener('mouseup', (e) => {
-    console.log('mouseup at DOCUMENT', e);
-    // if mousedown above any of the 'key' class
-    if (mousedownFiredEvent) {
-      mousedownFiredEvent.classList.remove('key-active');
-    }
-  });
+  elements.keyboard.addEventListener('mousedown', handlerMouseDown);
+  document.addEventListener('mouseup', handlerMouseUp);
+}
 
-  const keyboard = document.getElementsByClassName('keyboard')[0];
-  keyboard.addEventListener('mousedown', (e) => {
-    // console.log(e);
+initHandlers();
 
-    // find div.key
-    let target;
-    if (e.target.classList.value.indexOf('key') !== -1) {
-      // if exists then check if it's exactly 'key' not 'keyboard'
-      for (let i = 0; i < e.target.classList.length; i++) {
-        if (e.target.classList[i] === 'key') { target = e.target; break; }
-      }
-    } else if (!e.target.children.length) {
-      target = e.target.parentElement;
-    }
-    // store this node as a fired mousedown event to the future
-    mousedownFiredEvent = target;
+// TODO: физический TAB не даёт нужного результата, как событие по клику на кнопке TAB
+// TODO: смотреть на User Agent, если он связан с Mac OS => делать кнопки как у Mac, иначе как у Windows
+// TODO: некоторые символы генерируют вместо \ - значок параграфа (в виртуалке, на MacOS)
+// TODO: теряется фокус с textarea при нажатии на Alt (но в виртуалке не теряется)
+// TODO: (НЕВАЖНА) RightControl в Windows работает, в MacOS/VM - нет
+// TODO: (НЕВАЖНА) Fullscreen в Safari не работает
+// TODO: реализовать HOME & END (fn)
 
-    // make UI effects if event exists
-    if (target) target.classList.add('key-active');
-
-    // key input handler
-    handlerKeyInput(target, e, textarea);
-  });
-};
+// FIXME: indexof -> includes
+// TODO: Значок Win менять на Яблоко в MacOS (и красить в белый цвет через inline-svg)
+// FIXME: зажали клавиши и потеряли фокус с браузера на что-то кроме
