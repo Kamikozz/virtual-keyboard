@@ -1,29 +1,72 @@
 const variables = {
-  keys: {
-    'row-k': ['Esc', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
-      'Prtscr', 'Scroll lock', 'Pause', 'Insert', 'Delete', 'Pgup', 'Pgdn'],
-    'row-e': ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
-      'Num lock', '/', '*', '-'],
-    'row-d': ['Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
-      '7', '8', '9', '+'],
-    'row-c': ['Caps lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
-      '4', '5', '6'],
-    'row-b': ['Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'Shift', '↑',
-      '1', '2', '3', 'Enter'],
-    'row-a': ['Ctrl', 'Fn', 'Alt', '- -', '<', 'Altgr', '', 'Ctrl', '←', '↓',
-      '→', '0', '.'],
+  specialKeys: {
+    ESC: 'Esc',
+    F1: 'F1',
+    F2: 'F2',
+    F3: 'F3',
+    F4: 'F4',
+    F5: 'F5',
+    F6: 'F6',
+    F7: 'F7',
+    F8: 'F8',
+    F9: 'F9',
+    F10: 'F10',
+    F11: 'F11',
+    F12: 'F12',
+    PRINT_SCREEN: 'Prtscr',
+    SCROLL_LOCK: 'Scroll lock',
+    PAUSE: 'Pause',
+    INSERT: 'Insert',
+    DELETE: 'Delete',
+    PAGE_UP: 'Pgup',
+    PAGE_DOWN: 'Pgdn',
+    BACKSPACE: 'Backspace',
+    NUM_LOCK: 'Num lock',
+    TAB: 'Tab',
+    CAPS_LOCK: 'Caps lock',
+    ENTER: 'Enter',
+    SHIFT: 'Shift',
+    ARROW_UP: '↑',
+    CTRL: 'Ctrl',
+    FN: 'Fn',
+    ALT: 'Alt',
+    SPACE: '- -',
+    ALTGR: 'Altgr',
+    META: '',
+    ARROW_LEFT: '←',
+    ARROW_DOWN: '↓',
+    ARROW_RIGHT: '→',
   },
+  keys: null,
   mousedownFiredEvent: null, // store event object if mousedown fired at 'key' class
   languages: {
     EN: 'english',
     RU: 'русский',
   },
   KEYBOARD_LANGUAGE: 'keyboardLanguage',
-  specialKeys: {
-    CAPS_LOCK: 'Caps lock',
-    NUM_LOCK: 'Num lock',
-    SHIFT: 'Shift',
-  },
+};
+
+variables.keys = {
+  'row-k': [variables.specialKeys.ESC, variables.specialKeys.F1, variables.specialKeys.F2,
+    variables.specialKeys.F3, variables.specialKeys.F4, variables.specialKeys.F5,
+    variables.specialKeys.F6, variables.specialKeys.F7, variables.specialKeys.F8,
+    variables.specialKeys.F9, variables.specialKeys.F10, variables.specialKeys.F11,
+    variables.specialKeys.F12, variables.specialKeys.PRINT_SCREEN,
+    variables.specialKeys.SCROLL_LOCK, variables.specialKeys.PAUSE, variables.specialKeys.INSERT,
+    variables.specialKeys.DELETE, variables.specialKeys.PAGE_UP, variables.specialKeys.PAGE_DOWN],
+  'row-e': ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
+    variables.specialKeys.BACKSPACE, variables.specialKeys.NUM_LOCK, '/', '*', '-'],
+  'row-d': [variables.specialKeys.TAB, 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']',
+    '\\', '7', '8', '9', '+'],
+  'row-c': [variables.specialKeys.CAPS_LOCK, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'',
+    variables.specialKeys.ENTER, '4', '5', '6'],
+  'row-b': [variables.specialKeys.SHIFT, 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
+    variables.specialKeys.SHIFT, variables.specialKeys.ARROW_UP, '1', '2', '3',
+    variables.specialKeys.ENTER],
+  'row-a': [variables.specialKeys.CTRL, variables.specialKeys.FN, variables.specialKeys.ALT,
+    variables.specialKeys.SPACE, '<', variables.specialKeys.ALTGR, variables.specialKeys.META,
+    variables.specialKeys.CTRL, variables.specialKeys.ARROW_LEFT, variables.specialKeys.ARROW_DOWN,
+    variables.specialKeys.ARROW_RIGHT, '0', '.'],
 };
 
 const classes = {
@@ -106,7 +149,7 @@ function getAlphabet(language) {
  * @param {Object} numpad map with key/value of the numpad keys on keyboard
  * @param {string} keyClassName string with the name of the class of keys
  */
-function changeKeysInnerText(alphabet, numpad, keyClassName = 'key') {
+function changeKeysInnerText(alphabet, numpad, keyClassName = classes.KEY) {
   // TODO: fix bug with innerText
   // change symbols from english to russian, and backwards
   const numpadKeys = Object.keys(numpad);
@@ -116,7 +159,6 @@ function changeKeysInnerText(alphabet, numpad, keyClassName = 'key') {
   const keys = [...document.getElementsByClassName(keyClassName)]
     .map((node) => node.firstElementChild);
   console.log('Hey', keys);
-
 
   // change innerText to all of the elements (except numpad)
   // TODO: удалить DELETE_ME, когда будет в продакшене
@@ -153,7 +195,7 @@ function createSection(className) {
 function createKeyboard() {
   const keyboard = document.createElement('div');
   keyboard.className = classes.KEYBOARD;
-  keyboard.setAttribute('hidden', 'true');
+  keyboard.setAttribute(classes.HIDDEN, 'true');
 
   return keyboard;
 }
@@ -237,10 +279,6 @@ function createTree() {
   return returnObject;
 }
 
-// // get array of keys 'key'
-// TODO: children - возвращает массив, следовательно надо как-то эт массив сломать
-// если будет бага, то вернуть node.children с node.children[0]
-// const keyZ = Array.prototype.map.call(keys, (node) => node.children[0]);
 const elements = createTree();
 
 /**
@@ -260,7 +298,6 @@ function initLanguageFromStorage() {
   }
   // unhide the whole keyboard
   elements.keyboard.toggleAttribute(classes.HIDDEN);
-  // document.getElementsByClassName('keyboard')[0].toggleAttribute('hidden');
 }
 
 /**
@@ -314,16 +351,20 @@ function handlerKeyInput(elem, event) {
   // event.preventDefault();
   const el = elem.firstElementChild;
   switch (el.innerText) {
-    case 'Esc': case 'F1': case 'F2': case 'F3': case 'F4': case 'F6':
-    case 'F7': case 'F8': case 'F9': case 'F10': case 'F12':
-    case 'Prtscr': case 'Scroll lock': case 'Pause': case 'Insert':
-    case 'Num lock': case 'Ctrl': case 'Fn':
-    case 'Alt': case 'Altgr': case '↑': case '↓':
+    case variables.specialKeys.ESC: case variables.specialKeys.F1: case variables.specialKeys.F2:
+    case variables.specialKeys.F3: case variables.specialKeys.F4: case variables.specialKeys.F6:
+    case variables.specialKeys.F7: case variables.specialKeys.F8: case variables.specialKeys.F9:
+    case variables.specialKeys.F10: case variables.specialKeys.F12:
+    case variables.specialKeys.PRINT_SCREEN: case variables.specialKeys.SCROLL_LOCK:
+    case variables.specialKeys.PAUSE: case variables.specialKeys.INSERT:
+    case variables.specialKeys.NUM_LOCK: case variables.specialKeys.CTRL:
+    case variables.specialKeys.FN: case variables.specialKeys.ALT: case variables.specialKeys.ALTGR:
+    case variables.specialKeys.ARROW_UP: case variables.specialKeys.ARROW_DOWN:
       break;
-    case 'F5':
+    case variables.specialKeys.F5:
       document.location.reload();
       break;
-    case 'F11': {
+    case variables.specialKeys.F11: {
       if (document.fullscreenElement) {
         document.exitFullscreen();
       } else {
@@ -331,7 +372,7 @@ function handlerKeyInput(elem, event) {
       }
       break;
     }
-    case 'Delete': {
+    case variables.specialKeys.DELETE: {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
@@ -359,19 +400,19 @@ function handlerKeyInput(elem, event) {
       }
       break;
     }
-    case 'Pgup': {
+    case variables.specialKeys.PAGE_UP: {
       const fixOffset = 110;
       const offset = document.documentElement.clientHeight - fixOffset;
       window.scrollBy(0, -offset);
       break;
     }
-    case 'Pgdn': {
+    case variables.specialKeys.PAGE_DOWN: {
       const fixOffset = 110;
       const offset = document.documentElement.clientHeight - fixOffset;
       window.scrollBy(0, +offset);
       break;
     }
-    case 'Backspace': {
+    case variables.specialKeys.BACKSPACE: {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
@@ -399,7 +440,7 @@ function handlerKeyInput(elem, event) {
       }
       break;
     }
-    case 'Tab': {
+    case variables.specialKeys.TAB: {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
@@ -416,15 +457,17 @@ function handlerKeyInput(elem, event) {
       text.selectionEnd = text.selectionStart;
       break;
     }
-    case 'Caps lock':
+    case variables.specialKeys.CAPS_LOCK: {
       // TODO: changeCase
       //changeCase(keyZ, e, 'Caps lock');
       break;
-    case 'Shift':
+    }
+    case variables.specialKeys.SHIFT: {
       // TODO: changeCase
       //changeCase(keyZ, e, 'Caps lock');
       break;
-    case 'Enter': {
+    }
+    case variables.specialKeys.ENTER: {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
@@ -441,7 +484,7 @@ function handlerKeyInput(elem, event) {
       text.selectionEnd = text.selectionStart;
       break;
     }
-    case '- -': {
+    case variables.specialKeys.SPACE: {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
@@ -476,7 +519,7 @@ function handlerKeyInput(elem, event) {
       text.selectionEnd = text.selectionStart;
       break;
     }
-    case '←': {
+    case variables.specialKeys.ARROW_LEFT: {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
@@ -492,7 +535,7 @@ function handlerKeyInput(elem, event) {
       }
       break;
     }
-    case '→': {
+    case variables.specialKeys.ARROW_RIGHT: {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
@@ -541,11 +584,11 @@ const handlerKeyDown = (e) => {
 
   switch (e.key) {
     case 'CapsLock':
-      changeCase(elements.keys, e, 'Caps lock');
+      changeCase(elements.keys, e, variables.specialKeys.CAPS_LOCK);
       break;
-    case 'Shift':
+    case variables.specialKeys.SHIFT:
     // TODO: toUpperCase() or toLowerCase()
-      changeCase(elements.keys, e, 'Shift');
+      changeCase(elements.keys, e, variables.specialKeys.SHIFT);
       break;
     default: break;
   }
@@ -562,15 +605,16 @@ const handlerKeyDown = (e) => {
     if (elements.keys[i].innerText === e.key) {
       elements.keys[i].classList.add(classes.KEY_ACTIVE);
       break;
-    } else if ((elements.keys[i].innerText === 'Esc' && e.key === 'Escape')
-      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
-      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlRight')
-      || (elements.keys[i].innerText === 'Alt' && e.code === 'AltLeft')
-      || (elements.keys[i].innerText === 'Altgr' && e.code === 'AltRight')) {
+    } else if ((elements.keys[i].innerText === variables.specialKeys.ESC && e.key === 'Escape')
+      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlLeft')
+      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlRight')
+      || (elements.keys[i].innerText === variables.specialKeys.ALT && e.code === 'AltLeft')
+      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')) {
       elements.keys[i].classList.add(classes.KEY_ACTIVE);
       break;
-    } else if ((elements.keys[i].innerText === 'Caps lock' && e.key === 'CapsLock')
-            || (elements.keys[i].innerText === 'Num lock' && e.key === 'NumLock')) {
+    } else if ((elements.keys[i].innerText === variables.specialKeys.CAPS_LOCK
+        && e.key === 'CapsLock')
+      || (elements.keys[i].innerText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock')) {
       if (elements.keys[i].classList.contains(classes.KEY_ACTIVE)) {
         elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       } else {
@@ -581,7 +625,7 @@ const handlerKeyDown = (e) => {
   }
 
   for (let i = 0; i < elements.keys.length; i += 1) {
-    if (elements.keys[i].innerText === 'Tab') {
+    if (elements.keys[i].innerText === variables.specialKeys.TAB) {
       // e.preventDefault();
       // console.log(elements.keys[i], e);
       // handlerKeyInput(keyZ[i], e, textarea);
@@ -602,11 +646,11 @@ const handlerKeyUp = (e) => {
     if (elements.keys[i].innerText === e.key) {
       elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       break;
-    } else if ((elements.keys[i].innerText === 'Esc' && e.key === 'Escape')
-      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
-      || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlRight')
-      || (elements.keys[i].innerText === 'Alt' && e.code === 'AltLeft')
-      || (elements.keys[i].innerText === 'Altgr' && e.code === 'AltRight')) {
+    } else if ((elements.keys[i].innerText === variables.specialKeys.ESC && e.key === 'Escape')
+      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlLeft')
+      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlRight')
+      || (elements.keys[i].innerText === variables.specialKeys.ALT && e.code === 'AltLeft')
+      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')) {
       elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       break;
     }
