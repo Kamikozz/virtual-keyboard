@@ -18,6 +18,7 @@ const variables = {
     EN: 'english',
     RU: 'русский',
   },
+  KEYBOARD_LANGUAGE: 'keyboardLanguage',
 };
 
 const classes = {
@@ -27,6 +28,7 @@ const classes = {
   KEY_ACTIVE: 'key-active',
   META_WIN: 'icon-windows-logo',
   META_OTHER: 'icon-other-logo',
+  HIDDEN: 'hidden',
 };
 
 function getAlphabet(language) {
@@ -127,79 +129,9 @@ function changeKeysInnerText(alphabet, numpad, keyClassName = 'key') {
   }
 }
 
-/**
- * Invokes when window.onLoad() & gets the stored value in KEYBOARD_LANGUAGE
- * & sets the current language of the keyboard, unhides the 'keyboard' class.
- */
-function initLanguageFromStorage() {
-  const KEYBOARD_LANGUAGE = 'keyboardLanguage';
-  const EN = 'english';
-  const RU = 'русский';
-
-  switch (localStorage.getItem(KEYBOARD_LANGUAGE)) {
-    case RU: {
-      // change default english innerText to russian
-      const [alphabet, numpad] = getAlphabet(EN);
-      changeKeysInnerText(alphabet, numpad);
-      break;
-    }
-    case EN:
-    default: break;
-  }
-  // unhide the whole keyboard
-  document.getElementsByClassName('keyboard')[0].toggleAttribute('hidden');
-}
-
-/**
- * Changes the language stored in localStorage to the opposite.
- * Changes button's with className 'btn' innerText with name of the language.
- * Changes keys' innerText to the opposite
- */
-function changeLanguage() {
-  const KEYBOARD_LANGUAGE = 'keyboardLanguage';
-  const EN = 'english';
-  const RU = 'русский';
-
-  // make changes with localStorage
-  // and get source alphabet pair map {'en':'ru'} or {'ru':'en'}
-  let alphabet;
-  let numpad;
-  switch (localStorage.getItem(KEYBOARD_LANGUAGE)) {
-    case RU:
-      localStorage.setItem(KEYBOARD_LANGUAGE, EN);
-      [alphabet, numpad] = getAlphabet(RU);
-      break;
-    case EN:
-    default:
-      localStorage.setItem(KEYBOARD_LANGUAGE, RU);
-      [alphabet, numpad] = getAlphabet(EN);
-      break;
-  }
-
-  // // make visual changes into button
-  // const buttonName = document.getElementsByClassName('btn')[0];
-  // buttonName.innerText = localStorage.getItem(KEYBOARD_LANGUAGE);
-
-  // change symbols from english to russian, and backwards
-  changeKeysInnerText(alphabet, numpad);
-}
-
-function changeCase() {
-  console.log('lol');
-}
-
-function playKeypressSound() {
-  const audio = new Audio('assets/sound/key-press.mp3');
-  audio.play();
-}
-
 function isPlatformWindows() {
   return navigator.platform.toLowerCase().includes('win');
 }
-
-// //////////////////////////////////
-// clear local storage
-// localStorage.clear();
 
 function createSection(className) {
   const section = document.createElement('section');
@@ -306,6 +238,66 @@ function createTree() {
 // const keyZ = Array.prototype.map.call(keys, (node) => node.children[0]);
 const elements = createTree();
 
+/**
+ * Invokes when window.onLoad() & gets the stored value in KEYBOARD_LANGUAGE
+ * & sets the current language of the keyboard, unhides the 'keyboard' class.
+ */
+function initLanguageFromStorage() {
+  switch (localStorage.getItem(variables.KEYBOARD_LANGUAGE)) {
+    case variables.languages.RU: {
+      // change default english innerText to russian
+      const [alphabet, numpad] = getAlphabet(variables.languages.EN);
+      changeKeysInnerText(alphabet, numpad);
+      break;
+    }
+    case variables.languages.EN:
+    default: break;
+  }
+  // unhide the whole keyboard
+  elements.keyboard.toggleAttribute(classes.HIDDEN);
+  // document.getElementsByClassName('keyboard')[0].toggleAttribute('hidden');
+}
+
+/**
+ * Changes the language stored in localStorage to the opposite.
+ * Changes button's with className 'btn' innerText with name of the language.
+ * Changes keys' innerText to the opposite
+ */
+function changeLanguage() {
+  // make changes with localStorage
+  // and get source alphabet pair map {'en':'ru'} or {'ru':'en'}
+  let alphabet;
+  let numpad;
+  switch (localStorage.getItem(variables.KEYBOARD_LANGUAGE)) {
+    case variables.languages.RU:
+      localStorage.setItem(variables.KEYBOARD_LANGUAGE, variables.languages.EN);
+      [alphabet, numpad] = getAlphabet(variables.languages.RU);
+      break;
+    case variables.languages.EN:
+    default:
+      localStorage.setItem(variables.KEYBOARD_LANGUAGE, variables.languages.RU);
+      [alphabet, numpad] = getAlphabet(variables.languages.EN);
+      break;
+  }
+
+  // // make visual changes into button
+  // const buttonName = document.getElementsByClassName('btn')[0];
+  // buttonName.innerText = localStorage.getItem(KEYBOARD_LANGUAGE);
+
+  // change symbols from english to russian, and backwards
+  changeKeysInnerText(alphabet, numpad);
+}
+
+function changeCase() {
+  console.log('lol');
+}
+
+function playKeypressSound() {
+  const audio = new Audio('assets/sound/key-press.mp3');
+  audio.play();
+}
+
+// //////////////////////////////////
 initLanguageFromStorage(); // set language from storage init
 
 function handlerKeyInput(elem, event) {
@@ -315,8 +307,7 @@ function handlerKeyInput(elem, event) {
   text.focus();
 
   // event.preventDefault();
-
-  const el = elem.children[0];
+  const el = elem.firstElementChild;
   switch (el.innerText) {
     case 'Esc': case 'F1': case 'F2': case 'F3': case 'F4': case 'F6':
     case 'F7': case 'F8': case 'F9': case 'F10': case 'F12':
@@ -531,7 +522,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
   }
-  console.log(el);
 }
 
 // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
@@ -565,22 +555,21 @@ const handlerKeyDown = (e) => {
 
   for (let i = 0; i < elements.keys.length; i += 1) {
     if (elements.keys[i].innerText === e.key) {
-      elements.keys[i].classList.add('key-active');
+      elements.keys[i].classList.add(classes.KEY_ACTIVE);
       break;
     } else if ((elements.keys[i].innerText === 'Esc' && e.key === 'Escape')
       || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
       || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlRight')
       || (elements.keys[i].innerText === 'Alt' && e.code === 'AltLeft')
       || (elements.keys[i].innerText === 'Altgr' && e.code === 'AltRight')) {
-      elements.keys[i].classList.add('key-active');
+      elements.keys[i].classList.add(classes.KEY_ACTIVE);
       break;
-    } else if (
-      (elements.keys[i].innerText === 'Caps lock' && e.key === 'CapsLock')
-      || (elements.keys[i].innerText === 'Num lock' && e.key === 'NumLock')) {
-      if (elements.keys[i].classList.contains('key-active')) {
-        elements.keys[i].classList.remove('key-active');
+    } else if ((elements.keys[i].innerText === 'Caps lock' && e.key === 'CapsLock')
+            || (elements.keys[i].innerText === 'Num lock' && e.key === 'NumLock')) {
+      if (elements.keys[i].classList.contains(classes.KEY_ACTIVE)) {
+        elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       } else {
-        elements.keys[i].classList.add('key-active');
+        elements.keys[i].classList.add(classes.KEY_ACTIVE);
       }
       break;
     }
@@ -606,14 +595,14 @@ const handlerKeyUp = (e) => {
   // если отпустили - сбросить зажатие клавиши
   for (let i = 0; i < elements.keys.length; i += 1) {
     if (elements.keys[i].innerText === e.key) {
-      elements.keys[i].classList.remove('key-active');
+      elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       break;
     } else if ((elements.keys[i].innerText === 'Esc' && e.key === 'Escape')
       || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlLeft')
       || (elements.keys[i].innerText === 'Ctrl' && e.code === 'ControlRight')
       || (elements.keys[i].innerText === 'Alt' && e.code === 'AltLeft')
       || (elements.keys[i].innerText === 'Altgr' && e.code === 'AltRight')) {
-      elements.keys[i].classList.remove('key-active');
+      elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       break;
     }
   }
@@ -637,7 +626,7 @@ const handlerMouseDown = (e) => {
   // make UI effects if event exists
   if (target) {
     playKeypressSound();
-    target.classList.add(classes.KEY_ACTIVE);
+    target.classList.toggle(classes.KEY_ACTIVE);
   }
 
   // key input handler
@@ -645,8 +634,8 @@ const handlerMouseDown = (e) => {
 };
 
 const handlerMouseUp = (e) => {
-  console.log('mouseup at DOCUMENT', e);
   // if mousedown above any of the 'key' class
+  console.log(variables.mousedownFiredEvent);
   if (variables.mousedownFiredEvent) {
     variables.mousedownFiredEvent.classList.remove(classes.KEY_ACTIVE);
   }
@@ -676,10 +665,3 @@ initHandlers();
 // TODO: зажали клавиши и потеряли фокус с браузера на что-то кроме (хз, не фиксится)
 // FIXME: много повторных нажатий клавиш генерируют звук, фу
 // TODO: shift при клике по нему мышкой не должен работать как реальный шифт (то есть не надо его удерживать)
-
-
-// onpagehide
-
-document.addEventListener('onpagehide', () => {
-  console.log('Lol');
-});
