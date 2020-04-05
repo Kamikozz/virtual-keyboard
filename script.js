@@ -234,7 +234,17 @@ function createTree() {
   const keyboard = createKeyboard();
   sectionKeyboard.append(keyboard);
 
-  // const sectionKeyboard = createSection('section-');
+  const note = document.createElement('div');
+  note.classList.add('section-keyboard__note');
+  const textDeveloped = document.createElement('p');
+  const textSwitchKeyboardLayout = document.createElement('p');
+  textDeveloped.textContent = 'Developed on Microsoft© Windows.';
+  textSwitchKeyboardLayout
+    .textContent = 'CTRL + SHIFT; CTRL + ALT; SHIFT + ALT to switch keyboard layout.';
+
+  note.append(textDeveloped);
+  note.append(textSwitchKeyboardLayout);
+  sectionKeyboard.append(note);
 
   main.append(sectionTextarea.parentElement);
   main.append(sectionKeyboard.parentElement);
@@ -666,3 +676,10 @@ initHandlers();
 // TODO: зажали клавиши и потеряли фокус с браузера на что-то кроме (хз, не фиксится)
 // FIXME: много повторных нажатий клавиш генерируют звук, фу
 // TODO: shift при клике по нему мышкой не должен работать как реальный шифт (то есть не надо его удерживать)
+
+
+// onpagehide
+
+document.addEventListener('onpagehide', () => {
+  console.log('Lol');
+});
