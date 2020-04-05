@@ -1,53 +1,3 @@
-function createSection(className) {
-  const section = document.createElement('section');
-  if (arguments.length) section.className = className;
-
-  const wrapper = document.createElement('div');
-  wrapper.className = 'wrapper';
-
-  section.append(wrapper);
-
-  console.log('Created new section');
-  return section.children[0];
-}
-
-// must be <input> where we must enter the symbols
-function createInput() {
-  const textarea = document.createElement('textarea');
-
-  console.log('Created new input');
-  return textarea;
-}
-
-function createKeyboard() {
-  const keyboard = document.createElement('div');
-  keyboard.className = 'keyboard';
-  // keyboard.setAttribute('hidden', 'true');
-  // keyboard.setAttribute('hidden');
-
-  console.log('Created new keyboard');
-  return keyboard;
-}
-
-function createTree() {
-  const main = document.createElement('main');
-
-  const sectionTextarea = createSection('section-textarea');
-  const textarea = createInput();
-  sectionTextarea.append(textarea);
-
-  const sectionKeyboard = createSection('section-keyboard');
-  const keyboard = createKeyboard();
-  sectionKeyboard.append(keyboard);
-
-  main.append(sectionTextarea.parentElement);
-  main.append(sectionKeyboard.parentElement);
-
-  console.log(main);
-
-  document.body.append(main);
-}
-
 function getAlphabet(language) {
   const EN = 'english';
   const RU = 'русский';
@@ -442,6 +392,10 @@ function playKeypressSound() {
   audio.play();
 }
 
+function isPlatformWindows() {
+  return navigator.platform.toLowerCase().includes('win');
+}
+
 // function init() {
 //   // clear local storage
 //   // localStorage.clear();
@@ -449,40 +403,134 @@ function playKeypressSound() {
 //   createTree();
 // }
 
-function initElements() {
-  // const textarea = document.getElementsByTagName('textarea')[0];
-
-  // // get array of keys 'key'
-  // const keys = [...document.getElementsByClassName('key')];
-  // console.log(keys);
-  // TODO: children - возвращает массив, следовательно надо как-то эт массив сломать
-  // если будет бага, то вернуть node.children с node.children[0]
-  // const keyZ = Array.prototype.map.call(keys, (node) => node.children[0]);
-  // const keyZ = [...keys];
-  // console.log(keyZ);
-
-  // const keyboard = document.getElementsByClassName('keyboard')[0];
-  return {
-    textarea: document.getElementsByTagName('textarea')[0],
-    keys: [...document.getElementsByClassName('key')], // get array of keys 'key'
-    keyboard: document.getElementsByClassName('keyboard')[0],
-  };
-}
-
-function initTempVars() {
-  return {
-    mousedownFiredEvent: null, // store event object if mousedown fired at 'key' class
-  };
-}
-
 // //////////////////////////////////
 // clear local storage
 // localStorage.clear();
 
-createTree();
+const variables = {
+  keys: {
+    'row-k': ['Esc', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+      'Prtscr', 'Scroll lock', 'Pause', 'Insert', 'Delete', 'Pgup', 'Pgdn'],
+    'row-e': ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
+      'Num lock', '/', '*', '-'],
+    'row-d': ['Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
+      '7', '8', '9', '+'],
+    'row-c': ['Caps lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
+      '4', '5', '6'],
+    'row-b': ['Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'Shift', '↑',
+      '1', '2', '3', 'Enter'],
+    'row-a': ['Ctrl', 'Fn', 'Alt', '- -', '<', 'Altgr', '', 'Ctrl', '←', '↓',
+      '→', '0', '.'],
+  },
+  mousedownFiredEvent: null, // store event object if mousedown fired at 'key' class
+};
 
-const elements = initElements();
-const tempVars = initTempVars();
+const classes = {
+  TEXTAREA: 'textarea',
+  KEY: 'key',
+  KEYBOARD: 'keyboard',
+  KEY_ACTIVE: 'key-active',
+  META_WIN: 'icon-windows-logo',
+  META_OTHER: 'icon-other-logo',
+};
+
+function createSection(className) {
+  const section = document.createElement('section');
+  if (arguments.length) section.className = className;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'wrapper';
+
+  section.append(wrapper);
+
+  return section.children[0];
+}
+
+function createKeyboard() {
+  const keyboard = document.createElement('div');
+  keyboard.className = classes.KEYBOARD;
+  keyboard.setAttribute('hidden', 'true');
+
+  return keyboard;
+}
+
+function createTree() {
+  const main = document.createElement('main');
+
+  const sectionTextarea = createSection('section-textarea');
+  const textarea = document.createElement(classes.TEXTAREA);
+  textarea.setAttribute('placeholder',
+    'There will be displayed everything that you enter on the keyboard...');
+  sectionTextarea.append(textarea);
+
+  const sectionKeyboard = createSection('section-keyboard');
+  const keyboard = createKeyboard();
+  sectionKeyboard.append(keyboard);
+
+  main.append(sectionTextarea.parentElement);
+  main.append(sectionKeyboard.parentElement);
+
+  const returnObject = {
+    textarea,
+    keys: [],
+    'row-k': null,
+    'row-e': null,
+    'row-d': null,
+    'row-c': null,
+    'row-b': null,
+    'row-a': null,
+    keyboard,
+  };
+
+  const rows = Object.keys(variables.keys);
+  rows.forEach((rowClass) => {
+    const row = document.createElement('div');
+    row.classList.add(rowClass);
+
+    variables.keys[rowClass].forEach((text) => {
+      const span = document.createElement('span');
+      span.textContent = text;
+
+      const key = document.createElement('div');
+      key.classList.add(classes.KEY);
+      key.append(span);
+
+      row.append(key);
+
+      returnObject.keys.push(key); // get array of keys 'key'
+    });
+
+    keyboard.append(row);
+    returnObject[rowClass] = row;
+  });
+
+  // apply icon-windows-logo or icon-apple-logo
+  const keysRowA = returnObject['row-a'].children;
+  for (let i = 0; i < keysRowA.length; i += 1) {
+    const key = keysRowA[i].firstElementChild;
+    if (key.textContent === '') {
+      key.classList.add(isPlatformWindows() ? classes.META_WIN : classes.META_OTHER);
+      break;
+    }
+  }
+
+  // console.log(main);
+
+  document.body.append(main);
+
+  return returnObject;
+}
+
+// // get array of keys 'key'
+// TODO: children - возвращает массив, следовательно надо как-то эт массив сломать
+// если будет бага, то вернуть node.children с node.children[0]
+// const keyZ = Array.prototype.map.call(keys, (node) => node.children[0]);
+const elements = createTree();
+// const elements = {
+//   textarea: document.getElementsByTagName(classes.TEXTAREA)[0],
+//   keys: [...document.getElementsByClassName(classes.KEY)], // get array of keys 'key'
+//   keyboard: document.getElementsByClassName(classes.KEYBOARD)[0],
+// };
 
 initLanguageFromStorage(); // set language from storage init
 
@@ -529,8 +577,7 @@ const handlerKeyDown = (e) => {
     } else if (
       (elements.keys[i].innerText === 'Caps lock' && e.key === 'CapsLock')
       || (elements.keys[i].innerText === 'Num lock' && e.key === 'NumLock')) {
-      if (elements.keys[i].classList.value.indexOf('key-active') !== -1) {
-        // if 'key-active' is present then delete it
+      if (elements.keys[i].classList.contains('key-active')) {
         elements.keys[i].classList.remove('key-active');
       } else {
         elements.keys[i].classList.add('key-active');
@@ -541,7 +588,8 @@ const handlerKeyDown = (e) => {
 
   for (let i = 0; i < elements.keys.length; i += 1) {
     if (elements.keys[i].innerText === 'Tab') {
-      console.log(elements.keys[i], e);
+      // e.preventDefault();
+      // console.log(elements.keys[i], e);
       // handlerKeyInput(keyZ[i], e, textarea);
       break;
     }
@@ -576,27 +624,25 @@ const handlerKeyUp = (e) => {
 // TODO: событие mousedown - делать что-то many times
 // TODO: динамическая смена раскладки
 const handlerMouseDown = (e) => {
+  // const KEY = 'key';
+  // const KEY_ACTIVE = 'key-active';
   // console.log(e);
 
   // find div.key
   let target;
-  if (e.target.classList.value.indexOf('key') !== -1) {
-    // if exists then check if it's exactly 'key' not 'keyboard'
-    for (let i = 0; i < e.target.classList.length; i += 1) {
-      if (e.target.classList[i] === 'key') { target = e.target; break; }
-    }
+  if (e.target.classList.contains(classes.KEY)) {
+    target = e.target;
   } else if (!e.target.children.length) {
     target = e.target.parentElement;
   }
   // store this node as a fired mousedown event to the future removal
-  tempVars.mousedownFiredEvent = target;
+  variables.mousedownFiredEvent = target;
 
   // make UI effects if event exists
   if (target) {
     playKeypressSound();
-    target.classList.add('key-active');
+    target.classList.add(classes.KEY_ACTIVE);
   }
-
 
   // key input handler
   handlerKeyInput(target, e, elements.textarea);
@@ -604,8 +650,8 @@ const handlerMouseDown = (e) => {
 const handlerMouseUp = (e) => {
   console.log('mouseup at DOCUMENT', e);
   // if mousedown above any of the 'key' class
-  if (tempVars.mousedownFiredEvent) {
-    tempVars.mousedownFiredEvent.classList.remove('key-active');
+  if (variables.mousedownFiredEvent) {
+    variables.mousedownFiredEvent.classList.remove(classes.KEY_ACTIVE);
   }
 };
 
@@ -633,3 +679,4 @@ initHandlers();
 // TODO: Значок Win менять на Яблоко в MacOS (и красить в белый цвет через inline-svg)
 // TODO: зажали клавиши и потеряли фокус с браузера на что-то кроме (хз, не фиксится)
 // FIXME: много повторных нажатий клавиш генерируют звук, фу
+// TODO: shift при клике по нему мышкой не должен работать как реальный шифт (то есть не надо его удерживать)
