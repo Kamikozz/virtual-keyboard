@@ -169,12 +169,12 @@ body {
         // upper comma
         &:nth-child(1) {
           position: relative;
-          font-size: $base-font-size * 5;
+          // font-size: $base-font-size * 5;
           width: $base-key-width * 1.71 - 2 * $padding-width;
 
           span {
             position: absolute;
-            top: 12px;
+            top: 16px;
           }
         }
 
@@ -235,23 +235,23 @@ body {
           }
         }
 
-        &:nth-child(2)::after {
-          position: absolute;
-          right: 4px;
-          bottom: 0;
-          font-size: 18px;
-          opacity: 0.75;
-          content: "й";
-        }
+        // &:nth-child(2)::after {
+        //   position: absolute;
+        //   right: 4px;
+        //   bottom: 0;
+        //   font-size: 18px;
+        //   opacity: 0.75;
+        //   content: "й";
+        // }
 
-        &:nth-child(3)::after {
-          position: absolute;
-          right: 4px;
-          bottom: 0;
-          font-size: 18px;
-          opacity: 0.75;
-          content: "ц";
-        }
+        // &:nth-child(3)::after {
+        //   position: absolute;
+        //   right: 4px;
+        //   bottom: 0;
+        //   font-size: 18px;
+        //   opacity: 0.75;
+        //   content: "ц";
+        // }
         
         &:nth-child(1) {
           width: $base-key-width + (100 - $base-row-margins * 3) / 2;
@@ -273,9 +273,17 @@ body {
         }
 
         /* fixes bug with position absolute positioning */
-        &:nth-last-child(1):active {
-          left: unset;
-          right: 8px;
+        &:nth-last-child(1) {
+          &:active {
+            left: unset;
+            right: 8px;
+          }
+
+          &.key-active {
+            left: unset;
+            top: 2px;
+            right: 8px;
+          }
         }
       }
     }
@@ -357,9 +365,17 @@ body {
         }
 
         /* fixes bug with position absolute positioning */
-        &:nth-last-child(1):active {
-          left: unset;
-          right: 8px;
+        &:nth-last-child(1) {
+          &:active {
+            left: unset;
+            right: 8px;
+          }
+
+          &.key-active {
+            left: unset;
+            top: 2px;
+            right: 8px;
+          }
         }
       }
     }
