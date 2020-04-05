@@ -19,6 +19,11 @@ const variables = {
     RU: 'русский',
   },
   KEYBOARD_LANGUAGE: 'keyboardLanguage',
+  specialKeys: {
+    CAPS_LOCK: 'Caps lock',
+    NUM_LOCK: 'Num lock',
+    SHIFT: 'Shift',
+  },
 };
 
 const classes = {
@@ -626,7 +631,16 @@ const handlerMouseDown = (e) => {
   // make UI effects if event exists
   if (target) {
     playKeypressSound();
-    target.classList.toggle(classes.KEY_ACTIVE);
+
+    if (target.firstElementChild.innerText === variables.specialKeys.SHIFT) {
+      elements.keys.forEach((val) => {
+        if (val.firstElementChild.innerText === variables.specialKeys.SHIFT) {
+          val.classList.toggle(classes.KEY_ACTIVE);
+        }
+      });
+    } else {
+      target.classList.toggle(classes.KEY_ACTIVE);
+    }
   }
 
   // key input handler
@@ -634,11 +648,14 @@ const handlerMouseDown = (e) => {
 };
 
 const handlerMouseUp = (e) => {
-  // if mousedown above any of the 'key' class
-  console.log(variables.mousedownFiredEvent);
-  if (variables.mousedownFiredEvent) {
-    variables.mousedownFiredEvent.classList.remove(classes.KEY_ACTIVE);
-  }
+  if (!variables.mousedownFiredEvent) return;
+
+  const text = variables.mousedownFiredEvent.firstElementChild.innerText;
+  if (text === variables.specialKeys.CAPS_LOCK
+    || text === variables.specialKeys.NUM_LOCK
+    || text === variables.specialKeys.SHIFT) return;
+
+  variables.mousedownFiredEvent.classList.remove(classes.KEY_ACTIVE);
 };
 
 function initHandlers() {
@@ -661,7 +678,6 @@ initHandlers();
 // TODO: (НЕВАЖНА) Fullscreen в Safari не работает
 // TODO: реализовать HOME & END (fn)
 
-// TODO: Значок Win менять на Яблоко в MacOS (и красить в белый цвет через inline-svg)
+// TODO: (НЕВАЖНА) Значок Win менять на Яблоко в MacOS (и красить в белый цвет через inline-svg)
 // TODO: зажали клавиши и потеряли фокус с браузера на что-то кроме (хз, не фиксится)
 // FIXME: много повторных нажатий клавиш генерируют звук, фу
-// TODO: shift при клике по нему мышкой не должен работать как реальный шифт (то есть не надо его удерживать)
