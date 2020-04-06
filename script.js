@@ -351,11 +351,24 @@ function changeLanguage() {
   changeKeysInnerText(alphabet, numpad);
 }
 
+// FIXME: не подсвечивает смена case буквы на клавиатуре SHIFT/CAPSLOCK
 function changeCase() {
-  // console.log('Before upper/lower case', elements.keys);
-  elements.keys.forEach((text) => {
-    if (variables.layout.includes(text.firstElementChild.textContent)) {
-      text.classList.toggle(classes.KEY_UPPERCASE);
+  console.log('Before upper/lower case', elements.keys);
+  console.log(variables.layout);
+  elements.keys.forEach((key) => {
+    const innerElement = key.firstElementChild;
+    const text = innerElement.textContent.toLowerCase();
+    if (variables.layout.includes(text)) {
+      // if ()
+      if (key.classList.contains(classes.KEY_UPPERCASE)) {
+        key.classList.remove(classes.KEY_UPPERCASE);
+        innerElement.textContent = text;
+      } else {
+        key.classList.add(classes.KEY_UPPERCASE);
+        innerElement.textContent = text.toUpperCase();
+      }
+      // key.firstElementChild.textContent.toLowerCase();
+      // key.classList.toggle(classes.KEY_UPPERCASE);
     }
   });
 }
