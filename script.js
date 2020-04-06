@@ -681,9 +681,9 @@ const handlerKeyDown = (e) => {
       default: break;
     }
 
-    if ((e.ctrlKey && e.shiftKey)
-      || (e.ctrlKey && e.altKey)
-      || (e.shiftKey && e.altKey)) {
+    if (((e.ctrlKey && e.shiftKey) && (e.code === 'ControlLeft' || e.code === 'ShiftLeft'))
+    || ((e.ctrlKey && e.altKey) && (e.code === 'ControlLeft' || e.code === 'AltLeft'))
+    || ((e.shiftKey && e.altKey) && (e.code === 'ShiftLeft' || e.code === 'AltLeft'))) {
       changeLanguage();
     }
   }
@@ -692,6 +692,7 @@ const handlerKeyDown = (e) => {
 
   processKeySelection(e);
 };
+
 const handlerKeyUp = (e) => {
   console.log('ОТПУСТИЛИ:', e);
 
