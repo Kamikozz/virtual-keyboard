@@ -165,7 +165,6 @@ function getAlphabet(language) {
  * @param {string} keyClassName string with the name of the class of keys
  */
 function changeKeysInnerText(alphabet, numpad, keyClassName = classes.KEY) {
-  // TODO: fix bug with innerText
   // change symbols from english to russian, and backwards
   const numpadKeys = Object.keys(numpad);
   const numpadLength = numpadKeys ? numpadKeys.length : 0;
@@ -204,7 +203,7 @@ function createSection(className) {
 
   section.append(wrapper);
 
-  return section.children[0];
+  return section.firstElementChild;
 }
 
 function createKeyboard() {
@@ -287,8 +286,6 @@ function createTree() {
     }
   }
 
-  // console.log(main);
-
   document.body.append(main);
 
   return returnObject;
@@ -343,10 +340,6 @@ function changeLanguage() {
       break;
   }
 
-  // // make visual changes into button
-  // const buttonName = document.getElementsByClassName('btn')[0];
-  // buttonName.innerText = localStorage.getItem(KEYBOARD_LANGUAGE);
-
   // change symbols from english to russian, and backwards
   changeKeysInnerText(alphabet, numpad);
 }
@@ -359,7 +352,6 @@ function changeCase() {
     const innerElement = key.firstElementChild;
     const text = innerElement.textContent.toLowerCase();
     if (variables.layout.includes(text)) {
-      // if ()
       if (key.classList.contains(classes.KEY_UPPERCASE)) {
         key.classList.remove(classes.KEY_UPPERCASE);
         innerElement.textContent = text;
@@ -367,8 +359,6 @@ function changeCase() {
         key.classList.add(classes.KEY_UPPERCASE);
         innerElement.textContent = text.toUpperCase();
       }
-      // key.firstElementChild.textContent.toLowerCase();
-      // key.classList.toggle(classes.KEY_UPPERCASE);
     }
   });
 }
@@ -376,6 +366,7 @@ function changeCase() {
 function playKeypressSound() {
   const audio = new Audio('assets/sound/key-press.mp3');
   audio.play();
+  audio.volume = 0.5;
 }
 
 // //////////////////////////////////
@@ -387,7 +378,8 @@ function handlerKeyInput(elem, event) {
   const text = elements.textarea;
   text.focus();
 
-  // event.preventDefault();
+  event.preventDefault();
+
   const el = elem.firstElementChild;
   switch (el.innerText) {
     case variables.specialKeys.ESC: case variables.specialKeys.F1: case variables.specialKeys.F2:
@@ -414,7 +406,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.DELETE: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
       const len = 1;
@@ -454,7 +445,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.BACKSPACE: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
       const len = 1;
@@ -482,7 +472,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.TAB: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -507,7 +496,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.ENTER: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -524,7 +512,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.SPACE: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -542,7 +529,6 @@ function handlerKeyInput(elem, event) {
     }
     case '<': {
       // TODO: \| <
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -559,7 +545,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.ARROW_LEFT: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -575,7 +560,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.ARROW_RIGHT: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -591,7 +575,6 @@ function handlerKeyInput(elem, event) {
       break;
     }
     default: {
-      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -726,9 +709,6 @@ const handlerKeyUp = (e) => {
 };
 
 // ///////////////////////// MOUSE HANDLERS ///////////////////////////
-// TODO: событие клика - сделать что-то once
-// TODO: событие mousedown - делать что-то many times
-// TODO: динамическая смена раскладки
 const handlerMouseDown = (e) => {
   // find div.key
   let target;
@@ -782,14 +762,8 @@ function initHandlers() {
 
 initHandlers();
 
-// FIXME: физический TAB не даёт нужного результата, как событие по клику на кнопке TAB (нужен preventDefault)
-// TODO: смотреть на User Agent, если он связан с Mac OS => делать кнопки как у Mac, иначе как у Windows
 // TODO: некоторые символы генерируют вместо \ - значок параграфа (в виртуалке, на MacOS)
-// TODO: теряется фокус с textarea при нажатии на Alt (но в виртуалке не теряется)
 // TODO: (НЕВАЖНА) RightControl в Windows работает, в MacOS/VM - нет
 // TODO: (НЕВАЖНА) Fullscreen в Safari не работает
-// TODO: реализовать HOME & END (fn)
-
-// TODO: (НЕВАЖНА) Значок Win менять на Яблоко в MacOS (и красить в белый цвет через inline-svg)
+// TODO: (НЕВАЖНА) реализовать HOME & END (fn)
 // TODO: зажали клавиши и потеряли фокус с браузера на что-то кроме (хз, не фиксится)
-// FIXME: много повторных нажатий клавиш генерируют звук, фу
