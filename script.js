@@ -308,8 +308,14 @@ function initLanguageFromStorage() {
       changeKeysInnerText(alphabet, numpad);
       break;
     }
-    case variables.languages.EN:
-    default: break;
+    case variables.languages.EN: {
+      getAlphabet(variables.languages.EN);
+      break;
+    }
+    default: {
+      getAlphabet(variables.languages.EN);
+      break;
+    }
   }
   // unhide the whole keyboard
   elements.keyboard.toggleAttribute(classes.HIDDEN);
