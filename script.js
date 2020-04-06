@@ -595,7 +595,7 @@ function handlerKeyInput(elem, event) {
 const handlerKeyDown = (e) => {
   console.log('НАЖАЛИ:', e);
 
-  // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
+  e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
 
   if (e.repeat) return;
 
@@ -628,7 +628,14 @@ const handlerKeyDown = (e) => {
       || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlLeft')
       || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlRight')
       || (elements.keys[i].innerText === variables.specialKeys.ALT && e.code === 'AltLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')) {
+      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')
+      || (elements.keys[i].innerText === variables.specialKeys.SPACE && e.code === 'Space')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_UP && e.code === 'ArrowUp')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_DOWN && e.code === 'ArrowDown')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_LEFT && e.code === 'ArrowLeft')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_RIGHT && e.code === 'ArrowRight')
+      || (elements.keys[i].innerText === variables.specialKeys.PAGE_UP && e.code === 'PageUp')
+      || (elements.keys[i].innerText === variables.specialKeys.PAGE_DOWN && e.code === 'PageDown')) {
       elements.keys[i].classList.add(classes.KEY_ACTIVE);
       break;
     } else if ((elements.keys[i].innerText === variables.specialKeys.CAPS_LOCK
@@ -645,7 +652,6 @@ const handlerKeyDown = (e) => {
 
   for (let i = 0; i < elements.keys.length; i += 1) {
     if (elements.keys[i].innerText === variables.specialKeys.TAB) {
-      // e.preventDefault();
       // console.log(elements.keys[i], e);
       // handlerKeyInput(keyZ[i], e, textarea);
       break;
@@ -673,7 +679,14 @@ const handlerKeyUp = (e) => {
       || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlLeft')
       || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlRight')
       || (elements.keys[i].innerText === variables.specialKeys.ALT && e.code === 'AltLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')) {
+      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')
+      || (elements.keys[i].innerText === variables.specialKeys.SPACE && e.code === 'Space')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_UP && e.code === 'ArrowUp')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_DOWN && e.code === 'ArrowDown')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_LEFT && e.code === 'ArrowLeft')
+      || (elements.keys[i].innerText === variables.specialKeys.ARROW_RIGHT && e.code === 'ArrowRight')
+      || (elements.keys[i].innerText === variables.specialKeys.PAGE_UP && e.code === 'PageUp')
+      || (elements.keys[i].innerText === variables.specialKeys.PAGE_DOWN && e.code === 'PageDown')) {
       elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       break;
     }
