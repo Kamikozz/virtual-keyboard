@@ -419,15 +419,29 @@ body {
         &:nth-child(6) {
           font-size: $base-font-size * 1.2;
         }
+        // META BTN
+        &:nth-child(7) {
+          &.key-active {
+            background-color: white;
+          }
+        }
         &:nth-child(8) {
           font-size: $base-font-size * 1.2;
         }
 
-        $windows-logo-svg:
-          svg-factory-windows-logo($keyboard-text-color, 20, 20);
+        $windows-logo-svg: svg-factory-windows-logo($keyboard-text-color, 20, 20);
+        $apple-logo-svg: svg-factory-apple-logo($keyboard-text-color, 25, 25);
 
         .icon-windows-logo {
           background-image: url(svg-encode($windows-logo-svg));
+          background-position: center;
+          background-repeat: no-repeat;
+          width: 100%;
+          height: 100%;
+        }
+
+        .icon-apple-logo {
+          background-image: url(svg-encode($apple-logo-svg));
           background-position: center;
           background-repeat: no-repeat;
           width: 100%;

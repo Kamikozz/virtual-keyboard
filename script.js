@@ -76,7 +76,7 @@ const classes = {
   KEY_ACTIVE: 'key-active',
   KEY_UPPERCASE: 'key-uppercase',
   META_WIN: 'icon-windows-logo',
-  META_OTHER: 'icon-other-logo',
+  META_APPLE: 'icon-apple-logo',
   HIDDEN: 'hidden',
 };
 
@@ -282,7 +282,7 @@ function createTree() {
   for (let i = 0; i < keysRowA.length; i += 1) {
     const key = keysRowA[i].firstElementChild;
     if (key.textContent === '') {
-      key.classList.add(isPlatformWindows() ? classes.META_WIN : classes.META_OTHER);
+      key.classList.add(isPlatformWindows() ? classes.META_WIN : classes.META_APPLE);
       break;
     }
   }
