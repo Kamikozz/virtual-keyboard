@@ -398,7 +398,8 @@ function handlerKeyInput(elem, event) {
     case variables.specialKeys.PAUSE: case variables.specialKeys.INSERT:
     case variables.specialKeys.NUM_LOCK: case variables.specialKeys.CTRL:
     case variables.specialKeys.FN: case variables.specialKeys.ALT: case variables.specialKeys.ALTGR:
-    case variables.specialKeys.ARROW_UP: case variables.specialKeys.ARROW_DOWN:
+    case variables.specialKeys.META: case variables.specialKeys.ARROW_UP:
+    case variables.specialKeys.ARROW_DOWN:
       break;
     case variables.specialKeys.F5: {
       document.location.reload();
@@ -610,72 +611,103 @@ function handlerKeyInput(elem, event) {
   }
 }
 
-// ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
-const handlerKeyDown = (e) => {
-  console.log('НАЖАЛИ:', e);
+const isSpecialKey = (text, e) => (
+  (text === variables.specialKeys.ESC && e.key === 'Escape')
+|| (text === variables.specialKeys.SPACE && e.code === 'Space')
+|| (text === variables.specialKeys.ARROW_UP && e.code === 'ArrowUp')
+|| (text === variables.specialKeys.ARROW_DOWN && e.code === 'ArrowDown')
+|| (text === variables.specialKeys.ARROW_LEFT && e.code === 'ArrowLeft')
+|| (text === variables.specialKeys.ARROW_RIGHT && e.code === 'ArrowRight')
+|| (text === variables.specialKeys.PAGE_UP && e.code === 'PageUp')
+|| (text === variables.specialKeys.PAGE_DOWN && e.code === 'PageDown')
+|| (text === variables.specialKeys.ALTGR && e.code === 'AltRight')
+|| (text === variables.specialKeys.META && e.key === 'Meta')
+|| (text === variables.specialKeys.CTRL && e.code === 'ControlLeft')
+|| (text === variables.specialKeys.SHIFT && e.code === 'ShiftLeft')
+);
 
-  e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
+const isSecondKey = (text, e) => (
+  (text === variables.specialKeys.CTRL && e.code === 'ControlRight')
+|| (text === variables.specialKeys.SHIFT && e.code === 'ShiftRight')
+|| (text === variables.specialKeys.ALT && e.code === 'AltRight')
+|| (text === variables.specialKeys.ENTER && e.code === 'NumpadEnter')
+);
 
-  if (e.repeat) return;
-
-  playKeypressSound();
-
-  switch (e.key) {
-    case 'CapsLock':
-      changeCase(elements.keys, e, variables.specialKeys.CAPS_LOCK);
-      break;
-    case variables.specialKeys.SHIFT:
-    // TODO: toUpperCase() or toLowerCase()
-      changeCase(elements.keys, e, variables.specialKeys.SHIFT);
-      break;
+const processKeySelection = (e) => {
+  let isKeydown;
+  switch (e.type) {
+    case 'keydown': isKeydown = true; break;
+    case 'keyup': isKeydown = false; break;
     default: break;
   }
 
-  if ((e.ctrlKey && e.shiftKey)
-    || (e.ctrlKey && e.altKey)
-    || (e.shiftKey && e.altKey)) {
-    changeLanguage();
-  }
+  const addRemoveKeyActive = (currentKey) => {
+    if (isKeydown) {
+      currentKey.classList.add(classes.KEY_ACTIVE);
+    } else {
+      currentKey.classList.remove(classes.KEY_ACTIVE);
+    }
+  };
 
-  elements.textarea.focus();
-
+  let isRightKey = false;
   for (let i = 0; i < elements.keys.length; i += 1) {
-    if (elements.keys[i].innerText === e.key) {
-      elements.keys[i].classList.add(classes.KEY_ACTIVE);
+    if (isSpecialKey(elements.keys[i].innerText, e)) {
+      addRemoveKeyActive(elements.keys[i]);
       break;
-    } else if ((elements.keys[i].innerText === variables.specialKeys.ESC && e.key === 'Escape')
-      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlRight')
-      || (elements.keys[i].innerText === variables.specialKeys.ALT && e.code === 'AltLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')
-      || (elements.keys[i].innerText === variables.specialKeys.SPACE && e.code === 'Space')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_UP && e.code === 'ArrowUp')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_DOWN && e.code === 'ArrowDown')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_LEFT && e.code === 'ArrowLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_RIGHT && e.code === 'ArrowRight')
-      || (elements.keys[i].innerText === variables.specialKeys.PAGE_UP && e.code === 'PageUp')
-      || (elements.keys[i].innerText === variables.specialKeys.PAGE_DOWN && e.code === 'PageDown')) {
-      elements.keys[i].classList.add(classes.KEY_ACTIVE);
-      break;
-    } else if ((elements.keys[i].innerText === variables.specialKeys.CAPS_LOCK
-        && e.key === 'CapsLock')
-      || (elements.keys[i].innerText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock')) {
+    } else if (isKeydown
+      && ((elements.keys[i].innerText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')
+      || (elements.keys[i].innerText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock'))) {
       if (elements.keys[i].classList.contains(classes.KEY_ACTIVE)) {
         elements.keys[i].classList.remove(classes.KEY_ACTIVE);
       } else {
         elements.keys[i].classList.add(classes.KEY_ACTIVE);
       }
       break;
-    }
-  }
-
-  for (let i = 0; i < elements.keys.length; i += 1) {
-    if (elements.keys[i].innerText === variables.specialKeys.TAB) {
-      // console.log(elements.keys[i], e);
-      // handlerKeyInput(keyZ[i], e, textarea);
+    } else if (isSecondKey(elements.keys[i].innerText, e)) {
+      if (isRightKey) {
+        addRemoveKeyActive(elements.keys[i]);
+        break;
+      }
+      isRightKey = true;
+    } else if (elements.keys[i].innerText === e.key) {
+      addRemoveKeyActive(elements.keys[i]);
       break;
     }
   }
+};
+
+// ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
+const handlerKeyDown = (e) => {
+  console.log('НАЖАЛИ:', e);
+
+  e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
+
+  // if (e.repeat) return;
+
+  if (!e.repeat) {
+    playKeypressSound();
+
+    switch (e.key) {
+      case 'CapsLock':
+        changeCase(elements.keys, e, variables.specialKeys.CAPS_LOCK);
+        break;
+      case variables.specialKeys.SHIFT:
+      // TODO: toUpperCase() or toLowerCase()
+        changeCase(elements.keys, e, variables.specialKeys.SHIFT);
+        break;
+      default: break;
+    }
+
+    if ((e.ctrlKey && e.shiftKey)
+      || (e.ctrlKey && e.altKey)
+      || (e.shiftKey && e.altKey)) {
+      changeLanguage();
+    }
+  }
+
+  elements.textarea.focus();
+
+  processKeySelection(e);
 };
 const handlerKeyUp = (e) => {
   console.log('ОТПУСТИЛИ:', e);
@@ -690,26 +722,7 @@ const handlerKeyUp = (e) => {
   }
 
   // если отпустили - сбросить зажатие клавиши
-  for (let i = 0; i < elements.keys.length; i += 1) {
-    if (elements.keys[i].innerText === e.key) {
-      elements.keys[i].classList.remove(classes.KEY_ACTIVE);
-      break;
-    } else if ((elements.keys[i].innerText === variables.specialKeys.ESC && e.key === 'Escape')
-      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.CTRL && e.code === 'ControlRight')
-      || (elements.keys[i].innerText === variables.specialKeys.ALT && e.code === 'AltLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.ALTGR && e.code === 'AltRight')
-      || (elements.keys[i].innerText === variables.specialKeys.SPACE && e.code === 'Space')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_UP && e.code === 'ArrowUp')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_DOWN && e.code === 'ArrowDown')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_LEFT && e.code === 'ArrowLeft')
-      || (elements.keys[i].innerText === variables.specialKeys.ARROW_RIGHT && e.code === 'ArrowRight')
-      || (elements.keys[i].innerText === variables.specialKeys.PAGE_UP && e.code === 'PageUp')
-      || (elements.keys[i].innerText === variables.specialKeys.PAGE_DOWN && e.code === 'PageDown')) {
-      elements.keys[i].classList.remove(classes.KEY_ACTIVE);
-      break;
-    }
-  }
+  processKeySelection(e);
 };
 
 // ///////////////////////// MOUSE HANDLERS ///////////////////////////
