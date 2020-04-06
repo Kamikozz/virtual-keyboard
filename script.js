@@ -74,10 +74,18 @@ const classes = {
   KEY: 'key',
   KEYBOARD: 'keyboard',
   KEY_ACTIVE: 'key-active',
+  KEY_UPPERCASE: 'key-uppercase',
   META_WIN: 'icon-windows-logo',
   META_OTHER: 'icon-other-logo',
   HIDDEN: 'hidden',
 };
+
+function getSymbolsArray(alphabet) {
+  return [].concat(Object.keys(alphabet), Object.values(alphabet)).filter(
+    (val) => val !== '`' && val !== '[' && val !== ']' && val !== ';' && val !== '\'' && val !== ','
+    && val !== '.' && val !== '/',
+  );
+}
 
 function getAlphabet(language) {
   const languageEnglishRussian = {
@@ -121,8 +129,10 @@ function getAlphabet(language) {
   };
 
   switch (language) {
-    case variables.languages.EN:
+    case variables.languages.EN: {
+      variables.layout = getSymbolsArray(languageEnglishRussian);
       return [languageEnglishRussian, numpadEnglishRussian];
+    }
     case variables.languages.RU: {
       const languageRussianEnglish = {};
       Object.keys(languageEnglishRussian).forEach((key) => {
@@ -135,9 +145,14 @@ function getAlphabet(language) {
         // languageEnglishRussian[key] = value -> langRusEng[value] = key;
         numpadRussianEnglish[numpadEnglishRussian[key]] = key;
       });
+
+      variables.layout = getSymbolsArray(languageRussianEnglish);
       return [languageRussianEnglish, numpadRussianEnglish];
     }
-    default: return [languageEnglishRussian, numpadEnglishRussian];
+    default: {
+      variables.layout = getSymbolsArray(languageEnglishRussian);
+      return [languageEnglishRussian, numpadEnglishRussian];
+    }
   }
 }
 
@@ -331,7 +346,12 @@ function changeLanguage() {
 }
 
 function changeCase() {
-  console.log('lol');
+  // console.log('Before upper/lower case', elements.keys);
+  elements.keys.forEach((text) => {
+    if (variables.layout.includes(text.firstElementChild.textContent)) {
+      text.classList.toggle(classes.KEY_UPPERCASE);
+    }
+  });
 }
 
 function playKeypressSound() {
@@ -361,9 +381,10 @@ function handlerKeyInput(elem, event) {
     case variables.specialKeys.FN: case variables.specialKeys.ALT: case variables.specialKeys.ALTGR:
     case variables.specialKeys.ARROW_UP: case variables.specialKeys.ARROW_DOWN:
       break;
-    case variables.specialKeys.F5:
+    case variables.specialKeys.F5: {
       document.location.reload();
       break;
+    }
     case variables.specialKeys.F11: {
       if (document.fullscreenElement) {
         document.exitFullscreen();
@@ -458,13 +479,11 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.CAPS_LOCK: {
-      // TODO: changeCase
-      //changeCase(keyZ, e, 'Caps lock');
+      changeCase(elements.keys, variables.specialKeys.CAPS_LOCK);
       break;
     }
     case variables.specialKeys.SHIFT: {
-      // TODO: changeCase
-      //changeCase(keyZ, e, 'Caps lock');
+      changeCase(elements.keys, variables.specialKeys.SHIFT);
       break;
     }
     case variables.specialKeys.ENTER: {
@@ -639,6 +658,10 @@ const handlerKeyUp = (e) => {
   // if (e.repeat) return;
   if (e.code === 'CapsLock') {
     return;
+  }
+
+  if (e.key === variables.specialKeys.SHIFT) {
+    changeCase();
   }
 
   // если отпустили - сбросить зажатие клавиши
