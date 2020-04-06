@@ -374,6 +374,7 @@ initLanguageFromStorage(); // set language from storage init
 
 function handlerKeyInput(elem, event) {
   if (!elem) return;
+  if (event.repeat) return;
 
   const text = elements.textarea;
   text.focus();
@@ -488,11 +489,11 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.CAPS_LOCK: {
-      changeCase(elements.keys, variables.specialKeys.CAPS_LOCK);
+      changeCase();
       break;
     }
     case variables.specialKeys.SHIFT: {
-      changeCase(elements.keys, variables.specialKeys.SHIFT);
+      changeCase();
       break;
     }
     case variables.specialKeys.ENTER: {
@@ -617,6 +618,7 @@ const isSecondKey = (text, e) => (
 );
 
 const processKeySelection = (e) => {
+  // if (e.repeat) return ;
   let isKeydown;
   switch (e.type) {
     case 'keydown': isKeydown = true; break;
@@ -633,11 +635,13 @@ const processKeySelection = (e) => {
   };
 
   let isRightKey = false;
+  let target;
   for (let i = 0; i < elements.keys.length; i += 1) {
     if (isSpecialKey(elements.keys[i].innerText, e)) {
       addRemoveKeyActive(elements.keys[i]);
+      target = elements.keys[i];
       break;
-    } else if (isKeydown
+    } else if (isKeydown && !e.repeat
       && ((elements.keys[i].innerText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')
       || (elements.keys[i].innerText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock'))) {
       if (elements.keys[i].classList.contains(classes.KEY_ACTIVE)) {
@@ -645,41 +649,46 @@ const processKeySelection = (e) => {
       } else {
         elements.keys[i].classList.add(classes.KEY_ACTIVE);
       }
+      target = elements.keys[i];
       break;
     } else if (isSecondKey(elements.keys[i].innerText, e)) {
       if (isRightKey) {
         addRemoveKeyActive(elements.keys[i]);
+        target = elements.keys[i];
         break;
       }
       isRightKey = true;
     } else if (elements.keys[i].innerText === e.key) {
       addRemoveKeyActive(elements.keys[i]);
+      target = elements.keys[i];
       break;
     }
   }
+
+  return target;
 };
 
 // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
 const handlerKeyDown = (e) => {
   console.log('НАЖАЛИ:', e);
 
-  e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
+  // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
 
   // if (e.repeat) return;
 
   if (!e.repeat) {
     playKeypressSound();
 
-    switch (e.key) {
-      case 'CapsLock':
-        changeCase(elements.keys, e, variables.specialKeys.CAPS_LOCK);
-        break;
-      case variables.specialKeys.SHIFT:
-      // TODO: toUpperCase() or toLowerCase()
-        changeCase(elements.keys, e, variables.specialKeys.SHIFT);
-        break;
-      default: break;
-    }
+    // switch (e.key) {
+    //   case 'CapsLock':
+    //     changeCase();
+    //     break;
+    //   case variables.specialKeys.SHIFT:
+    //   // TODO: toUpperCase() or toLowerCase()
+    //     changeCase();
+    //     break;
+    //   default: break;
+    // }
 
     if (((e.ctrlKey && e.shiftKey) && (e.code === 'ControlLeft' || e.code === 'ShiftLeft'))
     || ((e.ctrlKey && e.altKey) && (e.code === 'ControlLeft' || e.code === 'AltLeft'))
@@ -690,7 +699,8 @@ const handlerKeyDown = (e) => {
 
   elements.textarea.focus();
 
-  processKeySelection(e);
+  const target = processKeySelection(e);
+  handlerKeyInput(target, e);
 };
 
 const handlerKeyUp = (e) => {
