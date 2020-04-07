@@ -814,13 +814,23 @@ const handlerMouseDown = (e) => {
   if (target) {
     playKeypressSound();
 
-    if (target.firstElementChild.innerText === variables.specialKeys.SHIFT) {
+    const text = target.firstElementChild.innerText;
+    if ((e.ctrlKey && text === variables.specialKeys.SHIFT)
+    || (e.ctrlKey && text === variables.specialKeys.ALT)
+    || (e.shiftKey && text === variables.specialKeys.ALT)
+    || (e.shiftKey && text === variables.specialKeys.CTRL)
+    || (e.altKey && text === variables.specialKeys.SHIFT)
+    || (e.altKey && text === variables.specialKeys.CTRL)) {
+      changeLanguage();
+    }
+
+    if (text === variables.specialKeys.SHIFT) {
       elements.keys.forEach((val) => {
         if (val.firstElementChild.innerText === variables.specialKeys.SHIFT) {
           val.classList.toggle(classes.KEY_ACTIVE);
         }
       });
-    } else if (target.firstElementChild.innerText === variables.specialKeys.META) {
+    } else if (text === variables.specialKeys.META) {
       target.classList.toggle(classes.KEY_ACTIVE);
       target.firstElementChild.classList.toggle(
         isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
