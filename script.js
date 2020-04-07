@@ -150,7 +150,7 @@ variables.keyCodes = {
   },
 };
 
-console.log(variables);
+// console.log(variables);
 
 const classes = {
   TEXTAREA: 'textarea',
@@ -258,7 +258,7 @@ function changeKeysInnerText(alphabet, numpad, keyClassName = classes.KEY) {
   // get array of keys with keyClassName
   const keys = [...document.getElementsByClassName(keyClassName)]
     .map((node) => node.firstElementChild);
-  console.log('Hey', keys);
+  // console.log('Hey', keys);
 
   // change innerText to all of the elements (except numpad)
   // TODO: удалить DELETE_ME, когда будет в продакшене
@@ -410,8 +410,8 @@ const changeOnShift = () => {
     if (variables.shiftCodes.includes(currentKeyCode)) {
       const currentLang = localStorage.getItem(variables.KEYBOARD_LANGUAGE);
       const currentKey = key.firstElementChild;
-      currentKey.innerText = variables.keyCodes[currentLang][currentKeyCode]
-        [Number(variables.isShift)];
+      const codes = variables.keyCodes;
+      currentKey.innerText = codes[currentLang][currentKeyCode][Number(variables.isShift)];
     }
   });
 };
@@ -706,7 +706,7 @@ function handlerKeyInput(elem, event) {
         // put caret at right position
         text.selectionStart = start + symbol.length;
         text.selectionEnd = text.selectionStart;
-        console.log(text.selectionStart, text.selectionEnd);
+        // console.log(text.selectionStart, text.selectionEnd);
       }
       break;
     }
@@ -835,7 +835,7 @@ const processKeySelection = (e) => {
 // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
 const handlerKeyDown = (e) => {
   // console.log('Current Variables Keydown', variables);
-  console.log('НАЖАЛИ:', e);
+  // console.log('НАЖАЛИ:', e);
 
   // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
 
@@ -859,7 +859,7 @@ const handlerKeyDown = (e) => {
 
 const handlerKeyUp = (e) => {
   // console.log('Current Variables Keyup', variables);
-  console.log('ОТПУСТИЛИ:', e);
+  // console.log('ОТПУСТИЛИ:', e);
 
   // if (e.repeat) return;
   // if (e.code === 'CapsLock') {
