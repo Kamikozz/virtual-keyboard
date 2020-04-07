@@ -344,7 +344,6 @@ function changeLanguage() {
   changeKeysInnerText(alphabet, numpad);
 }
 
-// FIXME: не подсвечивает смена case буквы на клавиатуре SHIFT/CAPSLOCK
 function changeCase() {
   console.log('Before upper/lower case', elements.keys);
   console.log(variables.layout);
@@ -369,17 +368,21 @@ function playKeypressSound() {
   audio.volume = 0.5;
 }
 
-// //////////////////////////////////
 initLanguageFromStorage(); // set language from storage init
 
 function handlerKeyInput(elem, event) {
   if (!elem) return;
-  if (event.repeat) return;
+  // if (event.repeat) {
+  //   event.preventDefault();
+  //   return;
+  // }
 
   const text = elements.textarea;
   text.focus();
 
-  event.preventDefault();
+  // event.preventDefault();
+
+  const isMouse = () => event.type === 'mousedown';
 
   const el = elem.firstElementChild;
   switch (el.innerText) {
@@ -390,23 +393,31 @@ function handlerKeyInput(elem, event) {
     case variables.specialKeys.PRINT_SCREEN: case variables.specialKeys.SCROLL_LOCK:
     case variables.specialKeys.PAUSE: case variables.specialKeys.INSERT:
     case variables.specialKeys.NUM_LOCK: case variables.specialKeys.CTRL:
-    case variables.specialKeys.FN: case variables.specialKeys.ALT: case variables.specialKeys.ALTGR:
-    case variables.specialKeys.META: case variables.specialKeys.ARROW_UP:
-    case variables.specialKeys.ARROW_DOWN:
+    case variables.specialKeys.FN: case variables.specialKeys.META:
+    // case variables.specialKeys.ARROW_UP: case variables.specialKeys.ARROW_DOWN:
+      break;
+    case variables.specialKeys.ALT:
+      if (!isMouse()) event.preventDefault();
+      break;
+    case variables.specialKeys.ALTGR:
+      if (!isMouse()) event.preventDefault();
       break;
     case variables.specialKeys.F5: {
-      document.location.reload();
+      if (isMouse()) document.location.reload();
       break;
     }
     case variables.specialKeys.F11: {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        document.documentElement.requestFullscreen();
+      if (isMouse()) {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          document.documentElement.requestFullscreen();
+        }
       }
       break;
     }
     case variables.specialKeys.DELETE: {
+      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
       const len = 1;
@@ -446,6 +457,7 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.BACKSPACE: {
+      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
       const len = 1;
@@ -473,6 +485,7 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.TAB: {
+      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -493,10 +506,11 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.SHIFT: {
-      changeCase();
+      if (!event.repeat) changeCase();
       break;
     }
     case variables.specialKeys.ENTER: {
+      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -513,6 +527,8 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.SPACE: {
+      event.preventDefault();
+
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -530,6 +546,7 @@ function handlerKeyInput(elem, event) {
     }
     case '<': {
       // TODO: \| <
+      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -546,6 +563,7 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.ARROW_LEFT: {
+      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -561,6 +579,7 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.ARROW_RIGHT: {
+      event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
 
@@ -576,20 +595,27 @@ function handlerKeyInput(elem, event) {
       break;
     }
     default: {
-      const start = text.selectionStart;
-      const end = text.selectionEnd;
+      if (!isMouse() && (event.ctrlKey || event.shiftKey || event.altKey)) {
+        break;
+      }
 
-      const strBefore = text.value.substring(0, start);
-      const strAfter = text.value.substring(end);
-      const symbol = el.innerText;
+      if (isMouse()) {
+        event.preventDefault();
+        const start = text.selectionStart;
+        const end = text.selectionEnd;
 
-      // set textarea value to: text before caret + tab + text after caret
-      text.value = `${strBefore}${symbol}${strAfter}`;
+        const strBefore = text.value.substring(0, start);
+        const strAfter = text.value.substring(end);
+        const symbol = el.innerText;
 
-      // put caret at right position
-      text.selectionStart = start + symbol.length;
-      text.selectionEnd = text.selectionStart;
-      console.log(text.selectionStart, text.selectionEnd);
+        // set textarea value to: text before caret + tab + text after caret
+        text.value = `${strBefore}${symbol}${strAfter}`;
+
+        // put caret at right position
+        text.selectionStart = start + symbol.length;
+        text.selectionEnd = text.selectionStart;
+        console.log(text.selectionStart, text.selectionEnd);
+      }
       break;
     }
   }
