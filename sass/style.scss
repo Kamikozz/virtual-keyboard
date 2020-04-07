@@ -178,6 +178,12 @@ body {
           }
         }
 
+        //  fix Digit6 & Digit7 font
+        &:nth-child(7),
+        &:nth-child(8), {
+          font-family: sans-serif;
+        }
+
         // 12 & 18 - minus & numpad minus
         &:nth-child(12) {
           position: relative;

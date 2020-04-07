@@ -150,6 +150,9 @@ body {
   position: absolute;
   top: 16px;
 }
+.section-keyboard .keyboard .row-e .key:nth-child(7), .section-keyboard .keyboard .row-e .key:nth-child(8) {
+  font-family: sans-serif;
+}
 .section-keyboard .keyboard .row-e .key:nth-child(12), .section-keyboard .keyboard .row-e .key:nth-child(18) {
   position: relative;
 }

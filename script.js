@@ -46,6 +46,7 @@ const variables = {
     RU: 'русский',
   },
   KEYBOARD_LANGUAGE: 'keyboardLanguage',
+  DATA_KEYCODE: 'keycode',
 };
 
 variables.keys = {
@@ -70,6 +71,86 @@ variables.keys = {
     variables.specialKeys.CTRL, variables.specialKeys.ARROW_LEFT, variables.specialKeys.ARROW_DOWN,
     variables.specialKeys.ARROW_RIGHT, '0', '.'],
 };
+
+variables.structureKeyCodes = {
+  'row-k': ['Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12',
+    'PrintScreen', 'ScrollLock', 'Pause', 'Insert', 'Delete', 'PageUp', 'PageDown'],
+  'row-e': ['Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7',
+    'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace', 'NumLock', 'NumpadDivide',
+    'NumpadMultiply', 'NumpadSubtract'],
+  'row-d': ['Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP',
+    'BracketLeft', 'BracketRight', 'Backslash', 'Numpad7', 'Numpad8', 'Numpad9', 'NumpadAdd'],
+  'row-c': ['CapsLock', 'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL',
+    'Semicolon', 'Quote', 'Enter', 'Numpad4', 'Numpad5', 'Numpad6'],
+  'row-b': ['ShiftLeft', 'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'Comma', 'Period',
+    'Slash', 'ShiftRight', 'ArrowUp', 'Numpad1', 'Numpad2', 'Numpad3', 'NumpadEnter'],
+  'row-a': ['ControlLeft', 'Fn', 'AltLeft', 'Space', 'IntlBackslash', 'AltRight', 'MetaLeft',
+    'ControlRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'Numpad0', 'NumpadDecimal'],
+};
+
+variables.shiftCodes = [
+  'Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6',
+  'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal',
+  'BracketLeft', 'BracketRight', 'Backslash',
+  'Semicolon', 'Quote',
+  'Comma', 'Period', 'Slash',
+  'IntlBackslash', 'NumpadDecimal',
+];
+
+variables.keyCodes = {
+  [variables.languages.EN]: {
+    Backquote: ['`', '~'],
+    Digit1: ['1', '!'],
+    Digit2: ['2', '@'],
+    Digit3: ['3', '#'],
+    Digit4: ['4', '$'],
+    Digit5: ['5', '%'],
+    Digit6: ['6', '^'],
+    Digit7: ['7', '&'],
+    Digit8: ['8', '*'],
+    Digit9: ['9', '('],
+    Digit0: ['0', ')'],
+    Minus: ['-', '_'],
+    Equal: ['=', '+'],
+    BracketLeft: ['[', '{'],
+    BracketRight: [']', '}'],
+    Backslash: ['\\', '|'],
+    Semicolon: [';', ':'],
+    Quote: ['\'', '"'],
+    Comma: [',', '<'],
+    Period: ['.', '>'],
+    Slash: ['/', '?'],
+    IntlBackslash: ['\\', '|'],
+    NumpadDecimal: ['.', '.'],
+  },
+  [variables.languages.RU]: {
+    Backquote: ['ё', 'Ё'],
+    Digit1: ['1', '!'],
+    Digit2: ['2', '"'],
+    Digit3: ['3', '№'],
+    Digit4: ['4', ';'],
+    Digit5: ['5', '%'],
+    Digit6: ['6', ':'],
+    Digit7: ['7', '?'],
+    Digit8: ['8', '*'],
+    Digit9: ['9', '('],
+    Digit0: ['0', ')'],
+    Minus: ['-', '_'],
+    Equal: ['=', '+'],
+    BracketLeft: ['х', 'Х'],
+    BracketRight: ['ъ', 'Ъ'],
+    Backslash: ['\\', '/'],
+    Semicolon: ['ж', 'Ж'],
+    Quote: ['э', 'Э'],
+    Comma: ['б', 'Б'],
+    Period: ['ю', 'Ю'],
+    Slash: ['.', ','],
+    IntlBackslash: ['\\', '/'],
+    NumpadDecimal: [',', ','],
+  },
+};
+
+console.log(variables);
 
 const classes = {
   TEXTAREA: 'textarea',
@@ -263,12 +344,13 @@ function createTree() {
     const row = document.createElement('div');
     row.classList.add(rowClass);
 
-    variables.keys[rowClass].forEach((text) => {
+    variables.keys[rowClass].forEach((text, i) => {
       const span = document.createElement('span');
       span.textContent = text;
 
       const key = document.createElement('div');
       key.classList.add(classes.KEY);
+      key.dataset.keycode = variables.structureKeyCodes[rowClass][i];
       key.append(span);
 
       row.append(key);
@@ -322,9 +404,19 @@ function initLanguageFromStorage() {
   elements.keyboard.toggleAttribute(classes.HIDDEN);
 }
 
+const changeOnShift = () => {
+  elements.keys.forEach((key) => {
+    const currentKeyCode = key.dataset[variables.DATA_KEYCODE];
+    if (variables.shiftCodes.includes(currentKeyCode)) {
+      const currentLang = localStorage.getItem(variables.KEYBOARD_LANGUAGE);
+      const currentKey = key.firstElementChild;
+      currentKey.innerText = variables.keyCodes[currentLang][currentKeyCode]
+        [Number(variables.isShift)];
+    }
+  });
+};
+
 const changeCase = () => {
-  console.log('Before upper/lower case', elements.keys);
-  console.log(variables.layout);
   elements.keys.forEach((key) => {
     const innerElement = key.firstElementChild;
     const text = innerElement.textContent.toLowerCase();
@@ -523,6 +615,7 @@ function handlerKeyInput(elem, event) {
       if (!event.repeat) {
         variables.isShift = !variables.isShift;
         changeCase();
+        changeOnShift();
       }
       break;
     }
@@ -552,24 +645,6 @@ function handlerKeyInput(elem, event) {
       const strBefore = text.value.substring(0, start);
       const strAfter = text.value.substring(end);
       const symbol = ' ';
-
-      // set textarea value to: text before caret + tab + text after caret
-      text.value = `${strBefore}${symbol}${strAfter}`;
-
-      // put caret at right position
-      text.selectionStart = start + symbol.length;
-      text.selectionEnd = text.selectionStart;
-      break;
-    }
-    case '<': {
-      // TODO: \| <
-      event.preventDefault();
-      const start = text.selectionStart;
-      const end = text.selectionEnd;
-
-      const strBefore = text.value.substring(0, start);
-      const strAfter = text.value.substring(end);
-      const symbol = '\\';
 
       // set textarea value to: text before caret + tab + text after caret
       text.value = `${strBefore}${symbol}${strAfter}`;
@@ -759,7 +834,7 @@ const processKeySelection = (e) => {
 
 // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
 const handlerKeyDown = (e) => {
-  console.log('Current Variables Keydown', variables);
+  // console.log('Current Variables Keydown', variables);
   console.log('НАЖАЛИ:', e);
 
   // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
@@ -783,7 +858,7 @@ const handlerKeyDown = (e) => {
 };
 
 const handlerKeyUp = (e) => {
-  console.log('Current Variables Keyup', variables);
+  // console.log('Current Variables Keyup', variables);
   console.log('ОТПУСТИЛИ:', e);
 
   // if (e.repeat) return;
@@ -794,6 +869,7 @@ const handlerKeyUp = (e) => {
   if (e.key === variables.specialKeys.SHIFT) {
     variables.isShift = !variables.isShift;
     changeCase();
+    changeOnShift();
   }
 
   const PRINT_SCREEN = 'PrintScreen';
@@ -817,7 +893,7 @@ const handlerKeyUp = (e) => {
 
 // ///////////////////////// MOUSE HANDLERS ///////////////////////////
 const handlerMouseDown = (e) => {
-  console.log('Current Variables Mousedown', variables);
+  // console.log('Current Variables Mousedown', variables);
   // find div.key
   let target;
   if (e.target.classList.contains(classes.KEY)) {
@@ -866,7 +942,7 @@ const handlerMouseDown = (e) => {
 };
 
 const handlerMouseUp = () => {
-  console.log('Current Variables Mouseup', variables);
+  // console.log('Current Variables Mouseup', variables);
   if (!variables.mousedownFiredEvent) return;
 
   const text = variables.mousedownFiredEvent.firstElementChild.innerText;
