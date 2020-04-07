@@ -75,8 +75,11 @@ const classes = {
   KEYBOARD: 'keyboard',
   KEY_ACTIVE: 'key-active',
   KEY_UPPERCASE: 'key-uppercase',
+  ICON: 'icon',
   META_WIN: 'icon-windows-logo',
   META_APPLE: 'icon-apple-logo',
+  META_WIN_ACTIVE: 'icon-windows-logo-active',
+  META_APPLE_ACTIVE: 'icon-apple-logo-active',
   HIDDEN: 'hidden',
 };
 
@@ -276,12 +279,12 @@ function createTree() {
     returnObject[rowClass] = row;
   });
 
-  // apply icon-windows-logo or icon-apple-logo
+  // apply icon & icon-windows-logo or icon-apple-logo
   const keysRowA = returnObject['row-a'].children;
   for (let i = 0; i < keysRowA.length; i += 1) {
     const key = keysRowA[i].firstElementChild;
     if (key.textContent === '') {
-      key.classList.add(isPlatformWindows() ? classes.META_WIN : classes.META_APPLE);
+      key.classList.add(classes.ICON, isPlatformWindows() ? classes.META_WIN : classes.META_APPLE);
       break;
     }
   }
@@ -631,7 +634,7 @@ const isSpecialKey = (text, e) => (
 || (text === variables.specialKeys.PAGE_UP && e.code === 'PageUp')
 || (text === variables.specialKeys.PAGE_DOWN && e.code === 'PageDown')
 || (text === variables.specialKeys.ALTGR && e.code === 'AltRight')
-|| (text === variables.specialKeys.META && e.key === 'Meta')
+// || (text === variables.specialKeys.META && e.key === 'Meta')
 || (text === variables.specialKeys.CTRL && e.code === 'ControlLeft')
 || (text === variables.specialKeys.SHIFT && e.code === 'ShiftLeft')
 || (text === variables.specialKeys.SCROLL_LOCK && e.key === 'ScrollLock')
@@ -680,7 +683,25 @@ const processKeySelection = (e) => {
   let isRightKey = false;
   let target;
   for (let i = 0; i < elements.keys.length; i += 1) {
-    if (isSpecialKey(elements.keys[i].innerText, e)) {
+    if ((elements.keys[i].innerText === variables.specialKeys.META && e.key === 'Meta')) {
+      addRemoveKeyActive(elements.keys[i]);
+      if (isKeydown) {
+        elements.keys[i].firstElementChild.classList.remove(
+          isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
+        );
+        elements.keys[i].firstElementChild.classList.add(
+          isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
+        );
+      } else {
+        elements.keys[i].firstElementChild.classList.remove(
+          isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
+        );
+        elements.keys[i].firstElementChild.classList.add(
+          isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
+        );
+      }
+      break;
+    } else if (isSpecialKey(elements.keys[i].innerText, e)) {
       addRemoveKeyActive(elements.keys[i]);
       target = elements.keys[i];
       break;
@@ -799,6 +820,29 @@ const handlerMouseDown = (e) => {
           val.classList.toggle(classes.KEY_ACTIVE);
         }
       });
+    } else if (target.firstElementChild.innerText === variables.specialKeys.META) {
+      target.classList.toggle(classes.KEY_ACTIVE);
+      target.firstElementChild.classList.toggle(
+        isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
+      );
+      target.firstElementChild.classList.toggle(
+        isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
+      );
+      // if (isKeydown) {
+      //   elements.keys[i].firstElementChild.classList.remove(
+      //     isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
+      //   );
+      //   elements.keys[i].firstElementChild.classList.add(
+      //     isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
+      //   );
+      // } else {
+      //   elements.keys[i].firstElementChild.classList.remove(
+      //     isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
+      //   );
+      //   elements.keys[i].firstElementChild.classList.add(
+      //     isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
+      //   );
+      // }
     } else {
       target.classList.toggle(classes.KEY_ACTIVE);
     }
@@ -815,6 +859,15 @@ const handlerMouseUp = (e) => {
   if (text === variables.specialKeys.CAPS_LOCK
     || text === variables.specialKeys.NUM_LOCK
     || text === variables.specialKeys.SHIFT) return;
+
+  if (text === variables.specialKeys.META) {
+    variables.mousedownFiredEvent.firstElementChild.classList.add(
+      isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
+    );
+    variables.mousedownFiredEvent.firstElementChild.classList.remove(
+      isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
+    );
+  }
 
   variables.mousedownFiredEvent.classList.remove(classes.KEY_ACTIVE);
 };
