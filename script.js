@@ -364,7 +364,7 @@ function changeCase() {
 
 function playKeypressSound() {
   const audio = new Audio('assets/sound/key-press.mp3');
-  audio.play();
+  audio.autoplay = true;
   audio.volume = 0.5;
 }
 
