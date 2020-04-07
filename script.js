@@ -608,6 +608,9 @@ const isSpecialKey = (text, e) => (
 || (text === variables.specialKeys.META && e.key === 'Meta')
 || (text === variables.specialKeys.CTRL && e.code === 'ControlLeft')
 || (text === variables.specialKeys.SHIFT && e.code === 'ShiftLeft')
+|| (text === variables.specialKeys.SCROLL_LOCK && e.key === 'ScrollLock')
+|| (text === variables.specialKeys.PRINT_SCREEN && e.key === 'PrintScreen')
+|| (text === '<' && e.code === 'IntlBackslash')
 );
 
 const isSecondKey = (text, e) => (
@@ -615,6 +618,20 @@ const isSecondKey = (text, e) => (
 || (text === variables.specialKeys.SHIFT && e.code === 'ShiftRight')
 || (text === variables.specialKeys.ALT && e.code === 'AltRight')
 || (text === variables.specialKeys.ENTER && e.code === 'NumpadEnter')
+|| (text === '\\' && e.code === 'IntlBackslash')
+|| (text === '/' && e.code === 'Slash')
+|| (text === '-' && e.code === 'NumpadSubtract')
+|| (text === '0' && e.code === 'Numpad0')
+|| (text === '1' && e.code === 'Numpad1')
+|| (text === '2' && e.code === 'Numpad2')
+|| (text === '3' && e.code === 'Numpad3')
+|| (text === '4' && e.code === 'Numpad4')
+|| (text === '5' && e.code === 'Numpad5')
+|| (text === '6' && e.code === 'Numpad6')
+|| (text === '7' && e.code === 'Numpad7')
+|| (text === '8' && e.code === 'Numpad8')
+|| (text === '9' && e.code === 'Numpad9')
+|| (text === '.' && e.code === 'NumpadDecimal')
 );
 
 const processKeySelection = (e) => {
@@ -707,14 +724,29 @@ const handlerKeyUp = (e) => {
   console.log('ОТПУСТИЛИ:', e);
 
   // if (e.repeat) return;
-  if (e.code === 'CapsLock') {
-    return;
-  }
+  // if (e.code === 'CapsLock') {
+  //   return;
+  // }
 
   if (e.key === variables.specialKeys.SHIFT) {
     changeCase();
   }
 
+  const PRINT_SCREEN = 'PrintScreen';
+  if (e.key === PRINT_SCREEN) {
+    const customEvent = new KeyboardEvent('keydown', {
+      cancelable: true,
+      key: PRINT_SCREEN,
+      code: PRINT_SCREEN,
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      repeat: false,
+    });
+    handlerKeyDown(customEvent);
+    setTimeout(() => processKeySelection(e), 100);
+    return;
+  }
   // если отпустили - сбросить зажатие клавиши
   processKeySelection(e);
 };
