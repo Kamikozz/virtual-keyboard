@@ -683,48 +683,50 @@ const processKeySelection = (e) => {
   let isRightKey = false;
   let target;
   for (let i = 0; i < elements.keys.length; i += 1) {
-    if ((elements.keys[i].innerText === variables.specialKeys.META && e.key === 'Meta')) {
-      addRemoveKeyActive(elements.keys[i]);
+    const key = elements.keys[i];
+    const keyText = key.innerText;
+    if ((keyText === variables.specialKeys.META && e.key === 'Meta')) {
+      addRemoveKeyActive(key);
       if (isKeydown) {
-        elements.keys[i].firstElementChild.classList.remove(
+        key.firstElementChild.classList.remove(
           isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
         );
-        elements.keys[i].firstElementChild.classList.add(
+        key.firstElementChild.classList.add(
           isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
         );
       } else {
-        elements.keys[i].firstElementChild.classList.remove(
+        key.firstElementChild.classList.remove(
           isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
         );
-        elements.keys[i].firstElementChild.classList.add(
+        key.firstElementChild.classList.add(
           isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
         );
       }
       break;
-    } else if (isSpecialKey(elements.keys[i].innerText, e)) {
-      addRemoveKeyActive(elements.keys[i]);
-      target = elements.keys[i];
+    } else if (isSpecialKey(keyText, e)) {
+      addRemoveKeyActive(key);
+      target = key;
       break;
     } else if (isKeydown && !e.repeat
-      && ((elements.keys[i].innerText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')
-      || (elements.keys[i].innerText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock'))) {
-      if (elements.keys[i].classList.contains(classes.KEY_ACTIVE)) {
-        elements.keys[i].classList.remove(classes.KEY_ACTIVE);
+      && ((keyText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')
+      || (keyText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock'))) {
+      if (key.classList.contains(classes.KEY_ACTIVE)) {
+        key.classList.remove(classes.KEY_ACTIVE);
       } else {
-        elements.keys[i].classList.add(classes.KEY_ACTIVE);
+        key.classList.add(classes.KEY_ACTIVE);
       }
-      target = elements.keys[i];
+      target = key;
       break;
-    } else if (isSecondKey(elements.keys[i].innerText, e)) {
+    } else if (isSecondKey(keyText, e)) {
       if (isRightKey) {
-        addRemoveKeyActive(elements.keys[i]);
-        target = elements.keys[i];
+        addRemoveKeyActive(key);
+        target = key;
         break;
       }
       isRightKey = true;
-    } else if (elements.keys[i].innerText === e.key) {
-      addRemoveKeyActive(elements.keys[i]);
-      target = elements.keys[i];
+    } else if (keyText === e.key) {
+      addRemoveKeyActive(key);
+      target = key;
       break;
     }
   }
@@ -742,17 +744,6 @@ const handlerKeyDown = (e) => {
 
   if (!e.repeat) {
     playKeypressSound();
-
-    // switch (e.key) {
-    //   case 'CapsLock':
-    //     changeCase();
-    //     break;
-    //   case variables.specialKeys.SHIFT:
-    //   // TODO: toUpperCase() or toLowerCase()
-    //     changeCase();
-    //     break;
-    //   default: break;
-    // }
 
     if (((e.ctrlKey && e.shiftKey) && (e.code === 'ControlLeft' || e.code === 'ShiftLeft'))
     || ((e.ctrlKey && e.altKey) && (e.code === 'ControlLeft' || e.code === 'AltLeft'))
@@ -838,21 +829,6 @@ const handlerMouseDown = (e) => {
       target.firstElementChild.classList.toggle(
         isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
       );
-      // if (isKeydown) {
-      //   elements.keys[i].firstElementChild.classList.remove(
-      //     isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
-      //   );
-      //   elements.keys[i].firstElementChild.classList.add(
-      //     isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
-      //   );
-      // } else {
-      //   elements.keys[i].firstElementChild.classList.remove(
-      //     isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
-      //   );
-      //   elements.keys[i].firstElementChild.classList.add(
-      //     isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
-      //   );
-      // }
     } else {
       target.classList.toggle(classes.KEY_ACTIVE);
     }
@@ -862,7 +838,7 @@ const handlerMouseDown = (e) => {
   handlerKeyInput(target, e);
 };
 
-const handlerMouseUp = (e) => {
+const handlerMouseUp = () => {
   if (!variables.mousedownFiredEvent) return;
 
   const text = variables.mousedownFiredEvent.firstElementChild.innerText;
