@@ -63,7 +63,6 @@ body {
   background-color: $secondary-color;
 
   .keyboard {
-    // height: 350px;
     padding: 0 50px;
     background-color: $keyboard-color;
 
@@ -85,14 +84,6 @@ body {
 
       cursor: pointer;
       user-select: none;
-
-      // &:active {
-      //   box-shadow: 0px 1px 3px 0px $keyboard-text-color;
-      //   transition: box-shadow 0.15s ease-in;
-      //   top: 2px;
-      //   left: 2px;
-      //   // right: 5px;
-      // }
     }
 
     // set row margins to keys
@@ -169,7 +160,6 @@ body {
         // upper comma
         &:nth-child(1) {
           position: relative;
-          // font-size: $base-font-size * 5;
           width: $base-key-width * 1.71 - 2 * $padding-width;
 
           span {
@@ -240,24 +230,6 @@ body {
             width: $base-key-width - 2 * $padding-width;
           }
         }
-
-        // &:nth-child(2)::after {
-        //   position: absolute;
-        //   right: 4px;
-        //   bottom: 0;
-        //   font-size: 18px;
-        //   opacity: 0.75;
-        //   content: "й";
-        // }
-
-        // &:nth-child(3)::after {
-        //   position: absolute;
-        //   right: 4px;
-        //   bottom: 0;
-        //   font-size: 18px;
-        //   opacity: 0.75;
-        //   content: "ц";
-        // }
         
         &:nth-child(1) {
           width: $base-key-width + (100 - $base-row-margins * 3) / 2;
@@ -315,12 +287,12 @@ body {
         }
 
         &:nth-child(1) {
-          width: $base-key-width + (100 - $base-row-margins * 3) / 2; //TODO: CAPS + ENTER widths
+          width: $base-key-width + (100 - $base-row-margins * 3) / 2;
           font-size: $base-font-size * 1.2;
 
           justify-content: left;
         }
-        // TODO:
+
         &:nth-child(13) {
           width: 158px;
           font-size: $base-font-size * 1.2;
@@ -351,7 +323,7 @@ body {
           }
         }
 
-        // TODO: ???
+
         &:nth-child(1) {
           width: 125px;
           font-size: $base-font-size * 1.2;
@@ -407,7 +379,7 @@ body {
           }
         }
 
-        // TODO:
+
         &:nth-child(1) {
           font-size: $base-font-size * 1.2;
         }

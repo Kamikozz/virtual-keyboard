@@ -150,8 +150,6 @@ variables.keyCodes = {
   },
 };
 
-// console.log(variables);
-
 const classes = {
   TEXTAREA: 'textarea',
   KEY: 'key',
@@ -258,10 +256,8 @@ function changeKeysInnerText(alphabet, numpad, keyClassName = classes.KEY) {
   // get array of keys with keyClassName
   const keys = [...document.getElementsByClassName(keyClassName)]
     .map((node) => node.firstElementChild);
-  // console.log('Hey', keys);
 
   // change innerText to all of the elements (except numpad)
-  // TODO: удалить DELETE_ME, когда будет в продакшене
   const DELETE_ME = 1;
 
   for (let i = 0; i < keys.length - numpadLength - DELETE_ME; i += 1) {
@@ -477,15 +473,8 @@ initLanguageFromStorage(); // set language from storage init
 
 function handlerKeyInput(elem, event) {
   if (!elem) return;
-  // if (event.repeat) {
-  //   event.preventDefault();
-  //   return;
-  // }
-
   const text = elements.textarea;
   text.focus();
-
-  // event.preventDefault();
 
   const isMouse = () => event.type === 'mousedown';
 
@@ -499,7 +488,6 @@ function handlerKeyInput(elem, event) {
     case variables.specialKeys.PAUSE: case variables.specialKeys.INSERT:
     case variables.specialKeys.NUM_LOCK: case variables.specialKeys.CTRL:
     case variables.specialKeys.FN: case variables.specialKeys.META:
-    // case variables.specialKeys.ARROW_UP: case variables.specialKeys.ARROW_DOWN:
       break;
     case variables.specialKeys.ALT:
       if (!isMouse()) event.preventDefault();
@@ -706,7 +694,6 @@ function handlerKeyInput(elem, event) {
         // put caret at right position
         text.selectionStart = start + symbol.length;
         text.selectionEnd = text.selectionStart;
-        // console.log(text.selectionStart, text.selectionEnd);
       }
       break;
     }
@@ -723,7 +710,6 @@ const isSpecialKey = (text, e) => (
 || (text === variables.specialKeys.PAGE_UP && e.code === 'PageUp')
 || (text === variables.specialKeys.PAGE_DOWN && e.code === 'PageDown')
 || (text === variables.specialKeys.ALTGR && e.code === 'AltRight')
-// || (text === variables.specialKeys.META && e.key === 'Meta')
 || (text === variables.specialKeys.CTRL && e.code === 'ControlLeft')
 || (text === variables.specialKeys.SHIFT && e.code === 'ShiftLeft')
 || (text === variables.specialKeys.SCROLL_LOCK && e.key === 'ScrollLock')
@@ -753,7 +739,6 @@ const isSecondKey = (text, e) => (
 );
 
 const processKeySelection = (e) => {
-  // if (e.repeat) return ;
   let isKeydown;
   switch (e.type) {
     case 'keydown': isKeydown = true; break;
@@ -798,7 +783,6 @@ const processKeySelection = (e) => {
       break;
     } else if (isKeydown && !e.repeat
       && (keyText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')) {
-      // variables.isCapslock = !variables.isCapslock;
       if (key.classList.contains(classes.KEY_ACTIVE)) {
         key.classList.remove(classes.KEY_ACTIVE);
       } else {
@@ -834,13 +818,6 @@ const processKeySelection = (e) => {
 
 // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
 const handlerKeyDown = (e) => {
-  // console.log('Current Variables Keydown', variables);
-  // console.log('НАЖАЛИ:', e);
-
-  // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
-
-  // if (e.repeat) return;
-
   if (!e.repeat) {
     playKeypressSound();
 
@@ -858,14 +835,6 @@ const handlerKeyDown = (e) => {
 };
 
 const handlerKeyUp = (e) => {
-  // console.log('Current Variables Keyup', variables);
-  // console.log('ОТПУСТИЛИ:', e);
-
-  // if (e.repeat) return;
-  // if (e.code === 'CapsLock') {
-  //   return;
-  // }
-
   if (e.key === variables.specialKeys.SHIFT) {
     variables.isShift = !variables.isShift;
     changeCase();
@@ -893,7 +862,6 @@ const handlerKeyUp = (e) => {
 
 // ///////////////////////// MOUSE HANDLERS ///////////////////////////
 const handlerMouseDown = (e) => {
-  // console.log('Current Variables Mousedown', variables);
   // find div.key
   let target;
   if (e.target.classList.contains(classes.KEY)) {
@@ -942,7 +910,6 @@ const handlerMouseDown = (e) => {
 };
 
 const handlerMouseUp = () => {
-  // console.log('Current Variables Mouseup', variables);
   if (!variables.mousedownFiredEvent) return;
 
   const text = variables.mousedownFiredEvent.firstElementChild.innerText;
@@ -973,9 +940,3 @@ function initHandlers() {
 }
 
 initHandlers();
-
-// TODO: некоторые символы генерируют вместо \ - значок параграфа (в виртуалке, на MacOS)
-// TODO: (НЕВАЖНА) RightControl в Windows работает, в MacOS/VM - нет
-// TODO: (НЕВАЖНА) Fullscreen в Safari не работает
-// TODO: (НЕВАЖНА) реализовать HOME & END (fn)
-// TODO: зажали клавиши и потеряли фокус с браузера на что-то кроме (хз, не фиксится)
