@@ -39,6 +39,8 @@ const variables = {
   },
   keys: null,
   mousedownFiredEvent: null, // store event object if mousedown fired at 'key' class
+  isCapslock: false,
+  isShift: false,
   languages: {
     EN: 'english',
     RU: 'русский',
@@ -193,9 +195,8 @@ function changeKeysInnerText(alphabet, numpad, keyClassName = classes.KEY) {
   }
 }
 
-function isPlatformWindows() {
-  return navigator.platform.toLowerCase().includes('win');
-}
+const isPlatformWindows = () => navigator.platform.toLowerCase().includes('win');
+const isUppercase = () => variables.isShift !== variables.isCapslock; // XOR
 
 function createSection(className) {
   const section = document.createElement('section');
@@ -321,12 +322,36 @@ function initLanguageFromStorage() {
   elements.keyboard.toggleAttribute(classes.HIDDEN);
 }
 
+const changeCase = () => {
+  console.log('Before upper/lower case', elements.keys);
+  console.log(variables.layout);
+  elements.keys.forEach((key) => {
+    const innerElement = key.firstElementChild;
+    const text = innerElement.textContent.toLowerCase();
+    if (variables.layout.includes(text)) {
+      if (key.classList.contains(classes.KEY_UPPERCASE)) {
+        key.classList.remove(classes.KEY_UPPERCASE);
+        innerElement.textContent = text;
+      } else {
+        key.classList.add(classes.KEY_UPPERCASE);
+        innerElement.textContent = text.toUpperCase();
+      }
+    }
+  });
+};
+
 /**
  * Changes the language stored in localStorage to the opposite.
  * Changes button's with className 'btn' innerText with name of the language.
  * Changes keys' innerText to the opposite
  */
 function changeLanguage() {
+  // 1. remove key-uppercase before update
+  elements.keys.forEach((key) => {
+    key.classList.remove(classes.KEY_UPPERCASE);
+  });
+
+  // 2. changeLanguage
   // make changes with localStorage
   // and get source alphabet pair map {'en':'ru'} or {'ru':'en'}
   let alphabet;
@@ -345,31 +370,16 @@ function changeLanguage() {
 
   // change symbols from english to russian, and backwards
   changeKeysInnerText(alphabet, numpad);
+
+  // 3. restore uppercase
+  if (isUppercase()) changeCase();
 }
 
-function changeCase() {
-  console.log('Before upper/lower case', elements.keys);
-  console.log(variables.layout);
-  elements.keys.forEach((key) => {
-    const innerElement = key.firstElementChild;
-    const text = innerElement.textContent.toLowerCase();
-    if (variables.layout.includes(text)) {
-      if (key.classList.contains(classes.KEY_UPPERCASE)) {
-        key.classList.remove(classes.KEY_UPPERCASE);
-        innerElement.textContent = text;
-      } else {
-        key.classList.add(classes.KEY_UPPERCASE);
-        innerElement.textContent = text.toUpperCase();
-      }
-    }
-  });
-}
-
-function playKeypressSound() {
+const playKeypressSound = () => {
   const audio = new Audio('assets/sound/key-press.mp3');
-  audio.autoplay = true;
   audio.volume = 0.5;
-}
+  audio.autoplay = true;
+};
 
 initLanguageFromStorage(); // set language from storage init
 
@@ -505,11 +515,15 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.CAPS_LOCK: {
+      variables.isCapslock = !variables.isCapslock;
       changeCase();
       break;
     }
     case variables.specialKeys.SHIFT: {
-      if (!event.repeat) changeCase();
+      if (!event.repeat) {
+        variables.isShift = !variables.isShift;
+        changeCase();
+      }
       break;
     }
     case variables.specialKeys.ENTER: {
@@ -708,8 +722,17 @@ const processKeySelection = (e) => {
       target = key;
       break;
     } else if (isKeydown && !e.repeat
-      && ((keyText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')
-      || (keyText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock'))) {
+      && (keyText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')) {
+      // variables.isCapslock = !variables.isCapslock;
+      if (key.classList.contains(classes.KEY_ACTIVE)) {
+        key.classList.remove(classes.KEY_ACTIVE);
+      } else {
+        key.classList.add(classes.KEY_ACTIVE);
+      }
+      target = key;
+      break;
+    } else if (isKeydown && !e.repeat
+      && (keyText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock')) {
       if (key.classList.contains(classes.KEY_ACTIVE)) {
         key.classList.remove(classes.KEY_ACTIVE);
       } else {
@@ -736,6 +759,7 @@ const processKeySelection = (e) => {
 
 // ///////////////////////// KEYBOARD HANDLERS ///////////////////////////
 const handlerKeyDown = (e) => {
+  console.log('Current Variables Keydown', variables);
   console.log('НАЖАЛИ:', e);
 
   // e.preventDefault(); // TODO: DELETE THIS IN THE FUTURE();
@@ -759,6 +783,7 @@ const handlerKeyDown = (e) => {
 };
 
 const handlerKeyUp = (e) => {
+  console.log('Current Variables Keyup', variables);
   console.log('ОТПУСТИЛИ:', e);
 
   // if (e.repeat) return;
@@ -767,6 +792,7 @@ const handlerKeyUp = (e) => {
   // }
 
   if (e.key === variables.specialKeys.SHIFT) {
+    variables.isShift = !variables.isShift;
     changeCase();
   }
 
@@ -791,6 +817,7 @@ const handlerKeyUp = (e) => {
 
 // ///////////////////////// MOUSE HANDLERS ///////////////////////////
 const handlerMouseDown = (e) => {
+  console.log('Current Variables Mousedown', variables);
   // find div.key
   let target;
   if (e.target.classList.contains(classes.KEY)) {
@@ -839,6 +866,7 @@ const handlerMouseDown = (e) => {
 };
 
 const handlerMouseUp = () => {
+  console.log('Current Variables Mouseup', variables);
   if (!variables.mousedownFiredEvent) return;
 
   const text = variables.mousedownFiredEvent.firstElementChild.innerText;
