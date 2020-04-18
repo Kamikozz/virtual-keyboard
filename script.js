@@ -856,7 +856,8 @@ const handlerKeyUp = (e) => {
     setTimeout(() => processKeySelection(e), 100);
     return;
   }
-  // если отпустили - сбросить зажатие клавиши
+
+  // if released, reset the key hold
   processKeySelection(e);
 };
 

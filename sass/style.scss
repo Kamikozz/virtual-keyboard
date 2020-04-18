@@ -122,6 +122,7 @@ body {
             display: none;
           }
         }
+
         @media (min-width: $media-big) {
           &:nth-last-child(-n + 4) {
             width: $base-key-width - 2 * $padding-width;
@@ -182,6 +183,7 @@ body {
             top: 16px;
           }
         }
+
         &:nth-child(18) {
           @extend :nth-child(12);
         }
@@ -201,6 +203,7 @@ body {
         // * - asterisk
         &:nth-child(17) {
           position: relative;
+
           span {
             position: absolute;
             top: 15px;
@@ -234,7 +237,6 @@ body {
         &:nth-child(1) {
           width: $base-key-width + (100 - $base-row-margins * 3) / 2;
           font-size: $base-font-size * 1.2;
-
           justify-content: left;
         }
 
@@ -280,6 +282,7 @@ body {
             display: none;
           }
         }
+
         @media (min-width: $media-big) {
           &:nth-last-child(-n + 3) {
             width: $base-key-width - 2 * $padding-width;
@@ -289,7 +292,6 @@ body {
         &:nth-child(1) {
           width: $base-key-width + (100 - $base-row-margins * 3) / 2;
           font-size: $base-font-size * 1.2;
-
           justify-content: left;
         }
 
@@ -322,7 +324,6 @@ body {
             width: $base-key-width - 2 * $padding-width;
           }
         }
-
 
         &:nth-child(1) {
           width: 125px;
@@ -379,24 +380,28 @@ body {
           }
         }
 
-
         &:nth-child(1) {
           font-size: $base-font-size * 1.2;
         }
+
         &:nth-child(2) {
           font-size: $base-font-size * 1.2;
         }
+
         &:nth-child(3) {
           font-size: $base-font-size * 1.2;
         }
+
         // SPACE BTN
         &:nth-child(4) {
           font-size: $base-font-size * 1.2;
           width: 396px
         }
+
         &:nth-child(6) {
           font-size: $base-font-size * 1.2;
         }
+
         &:nth-child(8) {
           font-size: $base-font-size * 1.2;
         }
@@ -417,6 +422,7 @@ body {
         .icon-windows-logo {
           background-image: url(svg-encode($windows-logo-svg));
         }
+
         .icon-windows-logo-active {
           background-image: url(svg-encode($windows-logo-active-svg));
         }
@@ -424,6 +430,7 @@ body {
         .icon-apple-logo {
           background-image: url(svg-encode($apple-logo-svg));
         }
+
         .icon-apple-logo-active {
           background-image: url(svg-encode($apple-logo-active-svg));
         }
