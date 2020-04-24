@@ -500,12 +500,10 @@ function handlerKeyInput(elem, event) {
       break;
     }
     case variables.specialKeys.F11: {
-      if (isMouse()) {
-        if (document.fullscreenElement) {
-          document.exitFullscreen();
-        } else {
-          document.documentElement.requestFullscreen();
-        }
+      if (isMouse() && document.fullscreenElement) {
+        document.exitFullscreen();
+      } else if (isMouse() && !document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
       }
       break;
     }
@@ -662,12 +660,13 @@ function handlerKeyInput(elem, event) {
       event.preventDefault();
       const start = text.selectionStart;
       const end = text.selectionEnd;
+      const isTextEmpty = text && text.value && text.value.length;
 
       // check if selection presents
       if (start !== end) {
         // remove selection
         text.selectionStart = text.selectionEnd;
-      } else if (end !== text.value.length) {
+      } else if (end !== isTextEmpty) {
         // handle out of right boundaries
         text.selectionStart = start + 1;
         text.selectionEnd = text.selectionStart;
@@ -740,49 +739,49 @@ const isSecondKey = (text, e) => (
 
 const processKeySelection = (e) => {
   let isKeydown;
+
   switch (e.type) {
     case 'keydown': isKeydown = true; break;
     case 'keyup': isKeydown = false; break;
     default: break;
   }
 
-  const addRemoveKeyActive = (currentKey) => {
-    if (isKeydown) {
-      currentKey.classList.add(classes.KEY_ACTIVE);
-    } else {
-      currentKey.classList.remove(classes.KEY_ACTIVE);
-    }
-  };
+  function addRemoveKeyActive(currentKey) {
+    return isKeydown
+      ? currentKey.classList.add(classes.KEY_ACTIVE)
+      : currentKey.classList.remove(classes.KEY_ACTIVE);
+  }
 
   let isRightKey = false;
   let target;
+
   for (let i = 0; i < elements.keys.length; i += 1) {
     const key = elements.keys[i];
     const keyText = key.innerText;
-    if ((keyText === variables.specialKeys.META && e.key === 'Meta')) {
+    const isMeta = (text, event) => text === variables.specialKeys.META && event.key === 'Meta';
+    const META_ICON = isPlatformWindows() ? classes.META_WIN : classes.META_APPLE;
+    const META_ACTIVE = isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE;
+    const isCapsLock = (text, event) => text === variables.specialKeys.CAPS_LOCK
+      && event.key === 'CapsLock';
+    const isNumLock = (text, event) => text === variables.specialKeys.NUM_LOCK
+      && event.key === 'NumLock';
+
+    if (isMeta(keyText, e)) {
       addRemoveKeyActive(key);
+
       if (isKeydown) {
-        key.firstElementChild.classList.remove(
-          isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
-        );
-        key.firstElementChild.classList.add(
-          isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
-        );
+        key.firstElementChild.classList.remove(META_ICON);
+        key.firstElementChild.classList.add(META_ACTIVE);
       } else {
-        key.firstElementChild.classList.remove(
-          isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
-        );
-        key.firstElementChild.classList.add(
-          isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
-        );
+        key.firstElementChild.classList.add(META_ICON);
+        key.firstElementChild.classList.remove(META_ACTIVE);
       }
       break;
     } else if (isSpecialKey(keyText, e)) {
       addRemoveKeyActive(key);
       target = key;
       break;
-    } else if (isKeydown && !e.repeat
-      && (keyText === variables.specialKeys.CAPS_LOCK && e.key === 'CapsLock')) {
+    } else if (isKeydown && !e.repeat && isCapsLock(keyText, e)) {
       if (key.classList.contains(classes.KEY_ACTIVE)) {
         key.classList.remove(classes.KEY_ACTIVE);
       } else {
@@ -790,8 +789,7 @@ const processKeySelection = (e) => {
       }
       target = key;
       break;
-    } else if (isKeydown && !e.repeat
-      && (keyText === variables.specialKeys.NUM_LOCK && e.key === 'NumLock')) {
+    } else if (isKeydown && !e.repeat && isNumLock(keyText, e)) {
       if (key.classList.contains(classes.KEY_ACTIVE)) {
         key.classList.remove(classes.KEY_ACTIVE);
       } else {
@@ -799,12 +797,11 @@ const processKeySelection = (e) => {
       }
       target = key;
       break;
-    } else if (isSecondKey(keyText, e)) {
-      if (isRightKey) {
-        addRemoveKeyActive(key);
-        target = key;
-        break;
-      }
+    } else if (isSecondKey(keyText, e) && isRightKey) {
+      addRemoveKeyActive(key);
+      target = key;
+      break;
+    } else if (isSecondKey(keyText, e) && !isRightKey) {
       isRightKey = true;
     } else if (keyText === e.key) {
       addRemoveKeyActive(key);
@@ -821,9 +818,14 @@ const handlerKeyDown = (e) => {
   if (!e.repeat) {
     playKeypressSound();
 
-    if (((e.ctrlKey && e.shiftKey) && (e.code === 'ControlLeft' || e.code === 'ShiftLeft'))
-    || ((e.ctrlKey && e.altKey) && (e.code === 'ControlLeft' || e.code === 'AltLeft'))
-    || ((e.shiftKey && e.altKey) && (e.code === 'ShiftLeft' || e.code === 'AltLeft'))) {
+    const isCtrlShiftPressed = e.ctrlKey && e.shiftKey
+      && (e.code === 'ControlLeft' || e.code === 'ShiftLeft');
+    const isCtrlAltPressed = e.ctrlKey && e.altKey
+      && (e.code === 'ControlLeft' || e.code === 'AltLeft');
+    const isAltShiftPressed = e.shiftKey && e.altKey
+      && (e.code === 'ShiftLeft' || e.code === 'AltLeft');
+
+    if (isCtrlShiftPressed || isCtrlAltPressed || isAltShiftPressed) {
       changeLanguage();
     }
   }
@@ -835,13 +837,14 @@ const handlerKeyDown = (e) => {
 };
 
 const handlerKeyUp = (e) => {
+  const PRINT_SCREEN = 'PrintScreen';
+
   if (e.key === variables.specialKeys.SHIFT) {
     variables.isShift = !variables.isShift;
     changeCase();
     changeOnShift();
   }
 
-  const PRINT_SCREEN = 'PrintScreen';
   if (e.key === PRINT_SCREEN) {
     const customEvent = new KeyboardEvent('keydown', {
       cancelable: true,
@@ -878,29 +881,32 @@ const handlerMouseDown = (e) => {
     playKeypressSound();
 
     const text = target.firstElementChild.innerText;
-    if ((e.ctrlKey && text === variables.specialKeys.SHIFT)
-    || (e.ctrlKey && text === variables.specialKeys.ALT)
-    || (e.shiftKey && text === variables.specialKeys.ALT)
-    || (e.shiftKey && text === variables.specialKeys.CTRL)
-    || (e.altKey && text === variables.specialKeys.SHIFT)
-    || (e.altKey && text === variables.specialKeys.CTRL)) {
+    const isShift = (key) => key === variables.specialKeys.SHIFT;
+    const isCtrl = (key) => key === variables.specialKeys.CTRL;
+    const isAlt = (key) => key === variables.specialKeys.ALT;
+    const isCtrlShiftPressed = (e.ctrlKey && isShift(text)) || (e.shiftKey && isCtrl(text));
+    const isCtrlAltPressed = (e.ctrlKey && isAlt(text)) || (e.altKey && isCtrl(text));
+    const isAltShiftPressed = (e.altKey && isShift(text)) || (e.shiftKey && isAlt(text));
+
+    if (isCtrlShiftPressed || isCtrlAltPressed || isAltShiftPressed) {
       changeLanguage();
     }
 
-    if (text === variables.specialKeys.SHIFT) {
-      elements.keys.forEach((val) => {
-        if (val.firstElementChild.innerText === variables.specialKeys.SHIFT) {
-          val.classList.toggle(classes.KEY_ACTIVE);
+    const isMeta = (key) => key === variables.specialKeys.META;
+
+    if (isShift(text)) {
+      elements.keys.forEach((key) => {
+        if (isShift(key.firstElementChild.innerText)) {
+          key.classList.toggle(classes.KEY_ACTIVE);
         }
       });
-    } else if (text === variables.specialKeys.META) {
+    } else if (isMeta(text)) {
+      const META_ICON = isPlatformWindows() ? classes.META_WIN : classes.META_APPLE;
+      const META_ACTIVE = isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE;
+
       target.classList.toggle(classes.KEY_ACTIVE);
-      target.firstElementChild.classList.toggle(
-        isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
-      );
-      target.firstElementChild.classList.toggle(
-        isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
-      );
+      target.firstElementChild.classList.toggle(META_ICON);
+      target.firstElementChild.classList.toggle(META_ACTIVE);
     } else {
       target.classList.toggle(classes.KEY_ACTIVE);
     }
@@ -914,17 +920,20 @@ const handlerMouseUp = () => {
   if (!variables.mousedownFiredEvent) return;
 
   const text = variables.mousedownFiredEvent.firstElementChild.innerText;
-  if (text === variables.specialKeys.CAPS_LOCK
-    || text === variables.specialKeys.NUM_LOCK
-    || text === variables.specialKeys.SHIFT) return;
+  const isCapsLock = (key) => key === variables.specialKeys.CAPS_LOCK;
+  const isNumLock = (key) => key === variables.specialKeys.NUM_LOCK;
+  const isShift = (key) => key === variables.specialKeys.SHIFT;
 
-  if (text === variables.specialKeys.META) {
-    variables.mousedownFiredEvent.firstElementChild.classList.add(
-      isPlatformWindows() ? classes.META_WIN : classes.META_APPLE,
-    );
-    variables.mousedownFiredEvent.firstElementChild.classList.remove(
-      isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE,
-    );
+  if (isCapsLock(text) || isNumLock(text) || isShift(text)) return;
+
+  const isMeta = (key) => key === variables.specialKeys.META;
+
+  if (isMeta(text)) {
+    const META_ICON = isPlatformWindows() ? classes.META_WIN : classes.META_APPLE;
+    const META_ACTIVE = isPlatformWindows() ? classes.META_WIN_ACTIVE : classes.META_APPLE_ACTIVE;
+
+    variables.mousedownFiredEvent.firstElementChild.classList.add(META_ICON);
+    variables.mousedownFiredEvent.firstElementChild.classList.remove(META_ACTIVE);
   }
 
   variables.mousedownFiredEvent.classList.remove(classes.KEY_ACTIVE);
